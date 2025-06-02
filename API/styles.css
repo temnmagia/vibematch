@@ -1,0 +1,307 @@
+/* Загальні стилі */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #121212;
+  color: #eee;
+  min-height: 100vh;
+  user-select: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Центрування головного блоку на головній */
+.centered-container {
+  max-width: 400px;
+  margin: 12vh auto;
+  background: #1a1a1a;
+  border-radius: 15px;
+  padding: 40px 30px;
+  text-align: center;
+  box-shadow: 0 0 20px #a259ffaa;
+  user-select: none;
+}
+
+.centered-container h1 {
+  color: #a259ff;
+  margin-bottom: 15px;
+  font-size: 2.3rem;
+}
+
+.centered-container .highlight {
+  color: #bb88ff;
+}
+
+.centered-container p {
+  font-size: 1.1rem;
+  color: #bbb;
+  margin-bottom: 35px;
+}
+
+/* Кнопки */
+.btn {
+  display: inline-block;
+  padding: 14px 40px;
+  border-radius: 28px;
+  font-weight: 700;
+  font-size: 18px;
+  cursor: pointer;
+  border: none;
+  user-select: none;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  background: linear-gradient(45deg, #7e57ff, #a259ff);
+  color: #fff;
+  box-shadow: 0 0 15px #a259ffcc;
+  text-align: center;
+}
+
+.btn:hover {
+  background: linear-gradient(45deg, #a259ff, #7e57ff);
+  box-shadow: 0 0 25px #a259ffdd;
+}
+
+/* Кнопка виходу */
+.logout-btn {
+  background: transparent;
+  color: #a259ff;
+  border: 2px solid #a259ff;
+  padding: 10px 24px;
+  border-radius: 20px;
+  font-weight: 600;
+  margin-right: 10px;
+}
+
+.logout-btn:hover {
+  background: #a259ff;
+  color: #121212;
+  border-color: #a259ff;
+}
+
+/* Кнопка назад */
+.back-btn {
+  background: #2e2e2e;
+  padding: 10px 24px;
+  border-radius: 20px;
+  font-weight: 600;
+  color: #a259ff;
+  box-shadow: none;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.back-btn:hover {
+  background: #a259ff;
+  color: #121212;
+}
+
+/* Хедер кабінету */
+.cabinet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 30px;
+  background-color: #1e1e1e;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+.cabinet-header h1 {
+  color: #a259ff;
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.cabinet-buttons {
+  display: flex;
+  align-items: center;
+}
+
+/* Кабінет */
+.cabinet-main {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 20px;
+  user-select: none;
+}
+
+/* Інфо користувача */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 30px;
+  color: #ccc;
+}
+
+.user-image {
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border: 2px solid #a259ff;
+}
+
+.user-info h2 {
+  margin: 0;
+  font-size: 1.6rem;
+  color: #a259ff;
+}
+
+.user-info p {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
+/* Вкладки */
+.tabs {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 20px;
+  user-select: none;
+}
+
+.tab {
+  cursor: pointer;
+  padding-bottom: 5px;
+  color: #bbb;
+  font-weight: 600;
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.tab.active {
+  color: #a259ff;
+  border-bottom: 3px solid #a259ff;
+}
+
+/* Фільтри */
+.filter-form {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 30px;
+  color: #aaa;
+  font-weight: 600;
+}
+
+.filter-form label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-form select {
+  padding: 5px 8px;
+  background: #2a2a2a;
+  border-radius: 6px;
+  color: #eee;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  user-select: none;
+}
+
+/* Список карток (артисти, пісні) */
+.list-cards {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  max-height: 75vh;
+  overflow-y: auto;
+}
+
+.card {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  background: #1e1e1e;
+  border-radius: 12px;
+  padding: 10px 15px;
+  box-shadow: 0 0 15px #a259ff66;
+  user-select: none;
+}
+
+.num-circle {
+  width: 30px;
+  height: 30px;
+  background-color: #a259ff;
+  color: #121212;
+  font-weight: 700;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  flex-shrink: 0;
+  font-size: 1.1rem;
+}
+
+.card img {
+  border-radius: 10px;
+  flex-shrink: 0;
+  object-fit: cover;
+  user-select: none;
+}
+
+.card .info {
+  display: flex;
+  flex-direction: column;
+  color: #ddd;
+}
+
+.card .info strong {
+  font-size: 1.1rem;
+  margin-bottom: 3px;
+  user-select: none;
+}
+
+.card .info small {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  user-select: none;
+}
+
+/* Список жанрів */
+.list-genres {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 75vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.genre-item {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: #1e1e1e;
+  padding: 8px 15px;
+  border-radius: 12px;
+  box-shadow: 0 0 12px #a259ff66;
+  user-select: none;
+}
+
+.genre-name {
+  font-weight: 700;
+  color: #a259ff;
+  flex-grow: 1;
+  user-select: none;
+}
+
+.genre-count {
+  font-weight: 600;
+  opacity: 0.7;
+  user-select: none;
+}
+
+/* Горизонтальна прокрутка вкладок та списків */
+/* Для артистів можна зробити рядковий режим (за бажанням) */
+/* Але наразі тримаємо вертикальний список для простоти */
