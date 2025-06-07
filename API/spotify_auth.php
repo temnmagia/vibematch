@@ -2,7 +2,7 @@
 session_start();
 
 $client_id = 'ff991d6f6c224110be45fa35a875b85b';
-$redirect_uri = 'http://127.0.0.1/kursova/API/callback.php';
+$redirect_uri = 'http://127.0.0.1:80/vibematch/API/callback.php';
 $scope = 'user-read-email user-top-read user-read-private';
 
 $code_verifier = bin2hex(random_bytes(64));

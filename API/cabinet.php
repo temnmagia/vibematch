@@ -92,10 +92,12 @@ if ($tab === 'albums') {
     </form>
     <a href="index.php" class="btn back-btn">Назад</a>
   </div>
+  
 </header>
 
 <main class="cabinet-main">
-
+<button id="updateMoviesBtn">Оновити список фільмів</button>
+<div id="updateResult"></div>
   <?php if ($userData): ?>
   <section class="user-info">
     <img src="<?= htmlspecialchars($userData['images'][0]['url'] ?? '') ?>" alt="User Image" class="user-image" />
@@ -209,6 +211,26 @@ if ($tab === 'albums') {
   </section>
 
 </main>
+
+<script>
+document.getElementById('updateMoviesBtn').addEventListener('click', () => {
+    const btn = document.getElementById('updateMoviesBtn');
+    const resultDiv = document.getElementById('updateResult');
+    btn.disabled = true;
+    resultDiv.textContent = 'Оновлення... Зачекайте, будь ласка.';
+
+    fetch('import_movies.php')
+        .then(response => response.text())
+        .then(data => {
+            resultDiv.innerHTML = data;
+            btn.disabled = false;
+        })
+        .catch(() => {
+            resultDiv.textContent = 'Сталася помилка при оновленні.';
+            btn.disabled = false;
+        });
+});
+</script>
 
 </body>
 </html>

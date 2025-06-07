@@ -1,27 +1,35 @@
-CREATE DATABASE moviemood;
-USE moviemood;
+CREATE DATABASE IF NOT EXISTS vibematch;
+USE vibematch;
 
+-- Користувачі
 CREATE TABLE users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(100),
-  spotify_token TEXT
+  email VARCHAR(100),
+  spotify_token TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Фільми
 CREATE TABLE movies (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  title VARCHAR(255),
+  title VARCHAR(255) NOT NULL,
   genre VARCHAR(100),
   mood VARCHAR(50),
   description TEXT,
-  image_url TEXT
+  image_url TEXT,
+  spotify_tags TEXT, -- для зберігання тегів типу жанрів або артистів
+  imdb_url TEXT
 );
 
+-- Історія користувача
 CREATE TABLE user_history (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT,
   movie_id INT,
   watched BOOLEAN DEFAULT FALSE,
-  rating INT,
-  FOREIGN KEY (user_id) REFERENCES users(id),
-  FOREIGN KEY (movie_id) REFERENCES movies(id)
+  rating INT CHECK (rating BETWEEN 1 AND 10),
+  watched_at TIMESTAMP NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (movie_id) REFERENCES movies(id) ON DELETE CASCADE
 );
