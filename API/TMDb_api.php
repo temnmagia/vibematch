@@ -63,3 +63,7 @@ function tmdb_get_poster_url(string $posterPath, string $size = 'w500') {
     if (!$posterPath) return null;
     return "https://image.tmdb.org/t/p/$size$posterPath";
 }
+function tmdb_get_imdb_id(int $movieId): ?string {
+    $details = tmdb_get_movie_details($movieId);
+    return $details['imdb_id'] ?? null;
+}
