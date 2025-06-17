@@ -1,14 +1,9 @@
 <?php
 session_start();
 $isLoggedIn = isset($_SESSION['spotify_token']);
+$showMovies = false; // Нова змінна для контролю відображення фільмів
 
 $movies = [];
-
-if ($isLoggedIn) {
-    // Підключаємо import_movies і отримуємо масив фільмів
-    // Переконайтеся, що 'give_movies.php' існує і повертає коректний масив
-    $movies = include 'give_movies.php';
-}
 
 // Обробка виходу
 if (isset($_POST['logout'])) {
@@ -16,6 +11,19 @@ if (isset($_POST['logout'])) {
     header("Location: index.php");
     exit();
 }
+
+// Якщо користувач увійшов і натиснув кнопку "Отримати рекомендації"
+if ($isLoggedIn && isset($_POST['get_recommendations'])) {
+    // Підключаємо import_movies і отримуємо масив фільмів
+    // Переконайтеся, що 'give_movies.php' існує і повертає коректний масив
+    $movies = include 'give_movies.php';
+    $showMovies = true; // Тепер можна показувати фільми
+}
+
+// Зауважте: якщо give_movies.php буде викликатися надто довго,
+// можливо, знадобиться AJAX-запит для кращого UX.
+// Але для поточної задачі достатньо такої логіки.
+
 ?>
 <!DOCTYPE html>
 <html lang="uk">
@@ -33,16 +41,17 @@ if (isset($_POST['logout'])) {
             <?php if (!$isLoggedIn): ?>
                 <a href="spotify_auth.php" class="btn auth-btn">Авторизуватись</a>
             <?php else: ?>
-                <div class="dropdown">
-                    <button class="btn cabinet-btn">Кабінет</button>
-                    <div class="dropdown-content">
-                        <a href="cabinet.php">Перейти в Кабінет</a>
-                        <div class="dropdown-divider"></div> <form method="post" style="display:inline;">
-                            <button type="submit" name="logout">Вийти</button>
-                        </form>
-                    </div>
-                </div>
-            <?php endif; ?>
+    <div class="dropdown">
+        <a href="cabinet.php" class="btn cabinet-btn">Кабінет</a>
+        <div class="dropdown-content">
+            <a href="cabinet.php">Перейти в Кабінет</a>
+            <div class="dropdown-divider"></div>
+            <form method="post" class="dropdown-form-button">
+                <button type="submit" name="logout">Вийти</button>
+            </form>
+        </div>
+    </div>
+<?php endif; ?>
         </nav>
     </header>
 
@@ -57,12 +66,19 @@ if (isset($_POST['logout'])) {
                 <p>Щоб зануритися у світ персоналізованих рекомендацій, будь ласка, авторизуйтесь.</p>
                 <a href="spotify_auth.php" class="btn auth-btn">Увійти через Spotify</a>
             </div>
-        <?php else: ?>
-            <?php if (empty($movies) || !is_array($movies)): ?>
+        <?php else: /* Користувач авторизований */ ?>
+            <?php if (!$showMovies): /* Показуємо кнопку, якщо фільми ще не завантажені */ ?>
+                <div class="message-card recommendation-prompt">
+                    <p>Натисніть кнопку нижче, щоб отримати персоналізовані рекомендації фільмів на основі ваших музичних вподобань Spotify!</p>
+                    <form method="post">
+                        <button type="submit" name="get_recommendations" class="btn">Отримати рекомендації</button>
+                    </form>
+                </div>
+            <?php elseif (empty($movies) || !is_array($movies)): /* Якщо фільми завантажені, але їх немає */ ?>
                 <div class="message-card no-recommendations">
                     <p>На жаль, наразі немає фільмів, що відповідають вашим вібраціям. Продовжуйте слухати музику або перевірте дані в Кабінеті.</p>
                 </div>
-            <?php else: ?>
+            <?php else: /* Якщо фільми завантажені і вони є */ ?>
                 <section class="movies-section">
                     <h3>Ваші персональні рекомендації:</h3>
                     <div class="movies-carousel">
