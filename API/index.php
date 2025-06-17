@@ -35,7 +35,8 @@ if ($isLoggedIn && isset($_POST['get_recommendations'])) {
 </head>
 <body>
     <header class="main-header">
-        <h1 class="app-title">VibeMatch</h1>
+<h1 class="app-title"><a href="index.php">VibeMatch</a></h1>
+
         <nav class="header-nav">
             <?php if (!$isLoggedIn): ?>
                 <a href="spotify_auth.php" class="btn auth-btn">Авторизуватись</a>
@@ -82,17 +83,17 @@ if ($isLoggedIn && isset($_POST['get_recommendations'])) {
                     <h3>Ваші персональні рекомендації:</h3>
                     <div class="movies-carousel">
                         <?php foreach ($movies as $movie): ?>
-                            <div class="movie-slide">
-                                <div class="movie-poster-wrapper">
-                                    <?php if (!empty($movie['image_url'])): ?>
-                                        <img src="<?= htmlspecialchars($movie['image_url']) ?>" alt="<?= htmlspecialchars($movie['title']) ?>" loading="lazy" class="movie-poster" />
-                                    <?php endif; ?>
-                                </div>
-                                <div class="movie-details">
-                                    <h4 class="movie-title"><?= htmlspecialchars($movie['title']) ?></h4>
-                                    <p class="movie-description"><?= nl2br(htmlspecialchars($movie['description'])) ?></p>
-                                </div>
-                            </div>
+<a href="movie.php?id=<?= $movie['tmdb_id'] ?>" class="movie-slide">
+    <div class="movie-poster-wrapper">
+        <?php if (!empty($movie['image_url'])): ?>
+            <img src="<?= htmlspecialchars($movie['image_url']) ?>" alt="<?= htmlspecialchars($movie['title']) ?>" loading="lazy" class="movie-poster" />
+        <?php endif; ?>
+    </div>
+    <div class="movie-details">
+        <h4 class="movie-title"><?= htmlspecialchars($movie['title']) ?></h4>
+        <p class="movie-description"><?= nl2br(htmlspecialchars($movie['description'])) ?></p>
+    </div>
+</a>
                         <?php endforeach; ?>
                     </div>
                 </section>

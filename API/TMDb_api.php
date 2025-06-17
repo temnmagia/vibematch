@@ -67,3 +67,8 @@ function tmdb_get_imdb_id(int $movieId): ?string {
     $details = tmdb_get_movie_details($movieId);
     return $details['imdb_id'] ?? null;
 }
+function tmdb_get_movie_trailers(int $movieId) {
+    return tmdb_api_request("/movie/$movieId/videos", [
+        'language' => 'en-US' // або 'uk-UA', але більшість трейлерів англійською
+    ]);
+}

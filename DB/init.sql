@@ -33,3 +33,19 @@ CREATE TABLE user_history (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (movie_id) REFERENCES movies(id) ON DELETE CASCADE
 );
+
+ALTER TABLE movies ADD tmdb_id INT;
+
+CREATE TABLE favorites (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    movie_id INT NOT NULL,
+    UNIQUE (user_id, movie_id)
+);
+CREATE TABLE votes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    movie_id INT NOT NULL,
+    vote TINYINT CHECK (vote IN (-1, 1)),
+    UNIQUE (user_id, movie_id)
+);

@@ -209,14 +209,15 @@ function saveMovieIfNotExists($pdo, $movie) {
     $imdb_url = $imdb_id ? "https://www.imdb.com/title/$imdb_id" : null;
 
     // Вставка у базу
-    $stmt = $pdo->prepare("INSERT INTO movies (title, genre, description, image_url, imdb_url) VALUES (?, ?, ?, ?, ?)");
-    $stmt->execute([
-        $movie['title'],
-        $genre_ids_str,
-        $movie['overview'] ?? '',
-        $image_url,
-        $imdb_url
-    ]);
+$stmt = $pdo->prepare("INSERT INTO movies (title, genre, description, image_url, imdb_url, tmdb_id) VALUES (?, ?, ?, ?, ?, ?)");
+$stmt->execute([
+    $movie['title'],
+    $genre_ids_str,
+    $movie['overview'] ?? '',
+    $image_url,
+    $imdb_url,
+    $movie['id'] // Оце TMDb ID
+]);
 }
 
 // Імпортуємо фільми (2 сторінки максимум)
