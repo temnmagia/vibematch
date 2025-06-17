@@ -17,47 +17,74 @@ $limit = $_GET['limit'] ?? 10;
 $time_range = $_GET['time_range'] ?? 'medium_term';
 $tab = $_GET['tab'] ?? 'artists';
 
+// Функція для отримання даних зі Spotify API
+function fetchSpotifyData($url, $token) {
+    $options = [
+        "http" => [
+            "header" => "Authorization: Bearer $token\r\n" .
+                        "Content-Type: application/json\r\n",
+            "method" => "GET",
+            "ignore_errors" => true // Важливо для обробки помилок
+        ]
+    ];
+    $context = stream_context_create($options);
+    $response = @file_get_contents($url, false, $context);
+
+    if ($response === false) {
+        // Логування помилки, якщо потрібно
+        // error_log("Failed to fetch data from Spotify API: " . $url);
+        return null;
+    }
+
+    $http_response_header_str = implode("\r\n", $http_response_header);
+    if (strpos($http_response_header_str, 'HTTP/1.1 200 OK') === false) {
+        // error_log("Spotify API returned non-200 status for $url: " . $http_response_header_str);
+        return null;
+    }
+
+    return json_decode($response, true);
+}
+
+
 // Отримання даних користувача
 // Зверніть увагу: URL-адреси є ПРИКЛАДАМИ.
 // Вам потрібно буде замінити їх на реальні кінцеві точки Spotify API.
-$userRes = @file_get_contents("https://api.spotify.com/v1/me", false, stream_context_create([
-    "http" => ["header" => "Authorization: Bearer $token"]
-]));
-$userData = $userRes ? json_decode($userRes, true) : null;
+$userData = fetchSpotifyData("https://api.spotify.com/v1/me", $token);
 
 // Функція для отримання топу з Spotify API
 function getTopItems($token, $type, $limit, $time_range) {
     // Приклад URL, вам потрібно використовувати реальні Spotify API
     $url = "https://api.spotify.com/v1/me/top/{$type}?limit={$limit}&time_range={$time_range}";
-    $res = @file_get_contents($url, false, stream_context_create([
-        "http" => ["header" => "Authorization: Bearer $token"]
-    ]));
-    $data = $res ? json_decode($res, true) : [];
+    $data = fetchSpotifyData($url, $token);
     return $data['items'] ?? [];
 }
 
 $topArtists = $tab === 'artists' ? getTopItems($token, 'artists', $limit, $time_range) : [];
 $topTracks = $tab === 'tracks' ? getTopItems($token, 'tracks', $limit, $time_range) : [];
 
-// Жанри
+// Жанри (збираємо з топ-виконавців)
 $topGenres = [];
 if ($tab === 'genres') {
-    $artistsForGenres = getTopItems($token, 'artists', 50, $time_range); // 50 артистів для кращої статистики жанрів
+    // Запитуємо більше артистів, щоб отримати повнішу картину жанрів
+    $artistsForGenres = getTopItems($token, 'artists', 50, $time_range);
     foreach ($artistsForGenres as $artist) {
         foreach ($artist['genres'] as $genre) {
-            $formattedGenre = ucwords(str_replace('-', ' ', $genre)); // Форматування жанрів
-            if (!isset($topGenres[$formattedGenre])) $topGenres[$formattedGenre] = 0;
+            $formattedGenre = ucwords(str_replace('-', ' ', $genre)); // Форматування назви жанру
+            if (!isset($topGenres[$formattedGenre])) {
+                $topGenres[$formattedGenre] = 0;
+            }
             $topGenres[$formattedGenre]++;
         }
     }
-    arsort($topGenres);
-    $topGenres = array_slice($topGenres, 0, $limit, true);
+    arsort($topGenres); // Сортування за кількістю у спадаючому порядку
+    $topGenres = array_slice($topGenres, 0, $limit, true); // Обрізаємо до потрібного ліміту
 }
 
-// Альбоми
+// Альбоми (збираємо з топ-пісень)
 $topAlbums = [];
 if ($tab === 'albums') {
-    $topTracksForAlbums = getTopItems($token, 'tracks', 50, $time_range); // 50 треків для кращої статистики альбомів
+    // Запитуємо більше треків, щоб отримати більше унікальних альбомів
+    $topTracksForAlbums = getTopItems($token, 'tracks', 50, $time_range);
     $albumMap = [];
 
     foreach ($topTracksForAlbums as $track) {
@@ -66,7 +93,7 @@ if ($tab === 'albums') {
         if (!isset($albumMap[$albumId])) {
             $albumMap[$albumId] = [
                 'name' => $album['name'],
-                'image' => $album['images'][0]['url'] ?? 'https://via.placeholder.com/80?text=No+Image', // Додайте запасне зображення
+                'image' => $album['images'][0]['url'] ?? 'https://via.placeholder.com/80?text=No+Image', // Запасне зображення
                 'url' => $album['external_urls']['spotify'] ?? '#',
                 'artists' => array_map(fn($a) => $a['name'], $album['artists']),
                 'count' => 1
@@ -76,14 +103,16 @@ if ($tab === 'albums') {
         }
     }
 
+    // Сортування альбомів за кількістю треків у них
     usort($albumMap, fn($a, $b) => $b['count'] - $a['count']);
-    $topAlbums = array_slice($albumMap, 0, $limit);
+    $topAlbums = array_slice($albumMap, 0, $limit); // Обрізаємо до потрібного ліміту
 }
 ?>
 <!DOCTYPE html>
 <html lang="uk">
 <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VibeMatch — Кабінет</title>
     <link rel="stylesheet" href="styles.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -149,8 +178,8 @@ if ($tab === 'albums') {
                     <?php foreach ($topArtists as $i => $artist): ?>
                         <li class="item-card" title="Переглянути в Spotify">
                             <div class="item-rank"><?= $i + 1 ?></div>
-                            <a href="<?= $artist['external_urls']['spotify'] ?>" target="_blank" class="item-link">
-                                <img src="<?= $artist['images'][0]['url'] ?? 'https://via.placeholder.com/80?text=Artist' ?>" alt="Artist Image" class="item-image" />
+                            <a href="<?= htmlspecialchars($artist['external_urls']['spotify']) ?>" target="_blank" class="item-link">
+                                <img src="<?= htmlspecialchars($artist['images'][0]['url'] ?? 'https://via.placeholder.com/80?text=Artist') ?>" alt="Artist Image" class="item-image" />
                             </a>
                             <div class="item-info">
                                 <strong class="item-title"><?= htmlspecialchars($artist['name']) ?></strong>
@@ -169,8 +198,8 @@ if ($tab === 'albums') {
                     <?php foreach ($topTracks as $i => $track): ?>
                         <li class="item-card" title="Переглянути в Spotify">
                             <div class="item-rank"><?= $i + 1 ?></div>
-                            <a href="<?= $track['external_urls']['spotify'] ?>" target="_blank" class="item-link">
-                                <img src="<?= $track['album']['images'][0]['url'] ?? 'https://via.placeholder.com/80?text=Track' ?>" alt="Track Image" class="item-image" />
+                            <a href="<?= htmlspecialchars($track['external_urls']['spotify']) ?>" target="_blank" class="item-link">
+                                <img src="<?= htmlspecialchars($track['album']['images'][0]['url'] ?? 'https://via.placeholder.com/80?text=Track') ?>" alt="Track Image" class="item-image" />
                             </a>
                             <div class="item-info">
                                 <strong class="item-title"><?= htmlspecialchars($track['name']) ?></strong>
@@ -185,12 +214,14 @@ if ($tab === 'albums') {
             <?php if (count($topGenres) === 0): ?>
                 <p class="message-card no-data-message">Немає даних про жанри за обраний період. (Завантажується з топ-виконавців)</p>
             <?php else: ?>
-                <ol class="genres-list">
+                <ol class="items-list">
                     <?php $pos = 1; foreach ($topGenres as $genre => $count): ?>
-                        <li class="genre-card">
+                        <li class="item-card">
                             <div class="item-rank"><?= $pos++ ?></div>
-                            <div class="genre-name"><?= htmlspecialchars($genre) ?></div>
-                            <div class="genre-count"><?= $count ?> разів</div>
+                            <div class="item-info" style="flex-direction: row; justify-content: space-between; align-items: center;">
+                                <strong class="item-title"><?= htmlspecialchars($genre) ?></strong>
+                                <small class="item-subtitle" style="flex-shrink: 0; margin-left: 15px;"><?= $count ?></small>
+                            </div>
                         </li>
                     <?php endforeach; ?>
                 </ol>
@@ -217,8 +248,6 @@ if ($tab === 'albums') {
             <?php endif; ?>
         <?php endif; ?>
     </section>
-
 </main>
-
 </body>
 </html>
