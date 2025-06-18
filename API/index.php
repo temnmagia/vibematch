@@ -1,9 +1,8 @@
 <?php
 session_start();
 $isLoggedIn = isset($_SESSION['spotify_token']);
-$showMovies = false; // Нова змінна для контролю відображення фільмів
-
-$movies = [];
+$showMovies = $_SESSION['show_movies'] ?? false;
+$movies = $_SESSION['last_movies'] ?? [];
 
 // Обробка виходу
 if (isset($_POST['logout'])) {
@@ -13,11 +12,24 @@ if (isset($_POST['logout'])) {
 }
 
 // Якщо користувач увійшов і натиснув кнопку "Отримати рекомендації"
-if ($isLoggedIn && isset($_POST['get_recommendations'])) {
-    // Підключаємо import_movies і отримуємо масив фільмів
-    // Переконайтеся, що 'give_movies.php' існує і повертає коректний масив
+if ($isLoggedIn && (isset($_POST['get_recommendations']) || isset($_POST['refresh_recommendations']))) {
+    // Ініціалізація масиву показаних фільмів
+    $_SESSION['shown_movie_ids'] = $_SESSION['shown_movie_ids'] ?? [];
+
+    // Отримати нові фільми
     $movies = include 'give_movies.php';
-    $showMovies = true; // Тепер можна показувати фільми
+
+    // Зберегти в сесію
+    $_SESSION['last_movies'] = $movies;
+    $_SESSION['show_movies'] = true;
+    $showMovies = true;
+
+    // Додати ID нових фільмів до списку показаних
+    foreach ($movies as $m) {
+        if (isset($m['id']) && $m['id'] !== -1) {
+            $_SESSION['shown_movie_ids'][] = $m['id'];
+        }
+    }
 }
 
 // Зауважте: якщо give_movies.php буде викликатися надто довго,
@@ -74,12 +86,16 @@ if ($isLoggedIn && isset($_POST['get_recommendations'])) {
                         <button type="submit" name="get_recommendations" class="btn">Отримати рекомендації</button>
                     </form>
                 </div>
+                
             <?php elseif (empty($movies) || !is_array($movies)): /* Якщо фільми завантажені, але їх немає */ ?>
                 <div class="message-card no-recommendations">
                     <p>На жаль, наразі немає фільмів, що відповідають вашим вібраціям. Продовжуйте слухати музику або перевірте дані в Кабінеті.</p>
                 </div>
             <?php else: /* Якщо фільми завантажені і вони є */ ?>
                 <section class="movies-section">
+                    <form method="post">
+                    <button type="submit" name="refresh_recommendations" class="btn">🔄 Оновити рекомендації</button>
+                    </form>
                     <h3>Ваші персональні рекомендації:</h3>
                     <div class="movies-carousel">
                         <?php foreach ($movies as $movie): ?>

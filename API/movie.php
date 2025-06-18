@@ -1,6 +1,8 @@
 <?php
 require_once 'TMDb_api.php';
-session_start();
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 if (!isset($_GET['id'])) {
     echo "Фільм не знайдено.";
     exit;

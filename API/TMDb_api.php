@@ -72,3 +72,12 @@ function tmdb_get_movie_trailers(int $movieId) {
         'language' => 'en-US' // або 'uk-UA', але більшість трейлерів англійською
     ]);
 }
+function tmdb_get_movies_by_genres(array $genreIds, int $page = 1) {
+    return tmdb_api_request('/discover/movie', [
+        'with_genres' => implode(',', $genreIds),
+        'page' => $page,
+        'language' => 'uk-UA',
+        'sort_by' => 'popularity.desc',
+        'include_adult' => false,
+    ]);
+}

@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 require_once 'db_connect.php';
 
 // Токен Spotify (припускаємо, що він у сесії)
