@@ -49,3 +49,4 @@ CREATE TABLE votes (
     vote TINYINT CHECK (vote IN (-1, 1)),
     UNIQUE (user_id, movie_id)
 );
+ALTER TABLE movies ADD 	COLUMN description_en TEXT;

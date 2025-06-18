@@ -54,9 +54,24 @@ function tmdb_get_genres() {
 }
 
 function tmdb_get_movie_details(int $movieId) {
-    return tmdb_api_request("/movie/$movieId", [
+    // Отримуємо українську версію
+    $uk = tmdb_api_request("/movie/$movieId", [
         'language' => 'uk-UA',
     ]);
+
+    // Якщо опис українською є — повертаємо його
+    if (!empty($uk['overview'])) {
+        return $uk;
+    }
+
+    // Інакше — отримуємо англійську версію і вставляємо англійський overview
+    $en = tmdb_api_request("/movie/$movieId", [
+        'language' => 'en-US',
+    ]);
+
+    // Підставляємо англійський опис у відповідь українською
+    $uk['overview'] = $en['overview'] ?? 'No description available.';
+    return $uk;
 }
 
 function tmdb_get_poster_url(string $posterPath, string $size = 'w500') {

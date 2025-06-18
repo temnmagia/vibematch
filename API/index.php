@@ -107,7 +107,9 @@ if ($isLoggedIn && (isset($_POST['get_recommendations']) || isset($_POST['refres
     </div>
     <div class="movie-details">
         <h4 class="movie-title"><?= htmlspecialchars($movie['title']) ?></h4>
-        <p class="movie-description"><?= nl2br(htmlspecialchars($movie['description'])) ?></p>
+<p class="movie-description">
+    <?= nl2br(htmlspecialchars($movie['description'] ?: $movie['description_en'])) ?>
+</p>
     </div>
 </a>
                         <?php endforeach; ?>

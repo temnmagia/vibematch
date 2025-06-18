@@ -163,15 +163,23 @@ do {
         $imdb_id = tmdb_get_imdb_id($movie['id']);
         $imdb_url = $imdb_id ? "https://www.imdb.com/title/$imdb_id" : null;
 
-        $stmt = $pdo->prepare("INSERT INTO movies (title, genre, description, image_url, imdb_url, tmdb_id) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->execute([
-            $movie['title'],
-            $genre_ids_str,
-            $movie['overview'] ?? '',
-            $image_url,
-            $imdb_url,
-            $movie['id']
-        ]);
+$ukDetails = tmdb_api_request("/movie/{$movie['id']}", ['language' => 'uk-UA']);
+$enDetails = tmdb_api_request("/movie/{$movie['id']}", ['language' => 'en-US']);
+
+$description_uk = $ukDetails['overview'] ?? '';
+$description_en = $enDetails['overview'] ?? '';
+
+// Додати до БД
+$stmt = $pdo->prepare("INSERT INTO movies (title, genre, description, description_en, image_url, imdb_url, tmdb_id) VALUES (?, ?, ?, ?, ?, ?, ?)");
+$stmt->execute([
+    $movie['title'],
+    $genre_ids_str,
+    $description_uk,
+    $description_en,
+    $image_url,
+    $imdb_url,
+    $movie['id']
+]);
     }
 
     $page++;
