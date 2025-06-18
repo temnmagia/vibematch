@@ -57,11 +57,13 @@ if (!empty($video['results'])) {
 <div class="main-content">
 <div class="intro-section" style="text-align: left;">
 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
-    <h2 style="margin: 1%;">
+    <h2 style="margin: 1%; flex-basis: 70%; flex-shrink: 1;">
         <?= htmlspecialchars($movie['title']) ?> (<?= substr($movie['release_date'], 0, 4) ?>)
     </h2>
-    <?php include 'movie_actions.php'; ?>
+    <div style="flex-basis: 25%; flex-shrink: 0; text-align: right;"> <?php include 'movie_actions.php'; ?>
+    </div>
 </div>
+
 <div style="display: flex; gap: 30px; flex-wrap: wrap;">
     <!-- Картинка з вертикальним центруванням -->
     <div style="display: flex; align-items: center; justify-content: center; min-width: 500px;">
