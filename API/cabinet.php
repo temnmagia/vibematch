@@ -260,7 +260,7 @@ if ($userId) {
 </head>
 <body>
 <header class="main-header">
-    <h1 class="app-title"><a href="index.php">VibeMatch</a></h1>
+    <h1 class="app-title"><a href="index.php">VIBEMATCH</a></h1>
     <nav class="header-nav">
         <form method="post" style="display:inline;">
             <button type="submit" name="logout" class="btn logout-btn">Вийти</button>
@@ -365,7 +365,7 @@ if ($userId) {
     </div>
 
     <div class="movies-sidebar">
-        <h3 style="color: #ccc;">💜 Обрані фільми</h3>
+        <h3 style="color: #ccc;">Обрані фільми</h3>
         <?php if (!empty($favMovies)): ?>
             <ol class="movies-list">
                 <?php foreach ($favMovies as $i => $movie): ?>

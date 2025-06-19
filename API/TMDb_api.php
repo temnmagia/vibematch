@@ -89,10 +89,12 @@ function tmdb_get_movie_trailers(int $movieId) {
 }
 function tmdb_get_movies_by_genres(array $genreIds, int $page = 1) {
     return tmdb_api_request('/discover/movie', [
-        'with_genres' => implode(',', $genreIds),
+        'with_genres' => implode('|', $genreIds),
         'page' => $page,
         'language' => 'uk-UA',
         'sort_by' => 'popularity.desc',
-        'include_adult' => false,
+        'include_adult' => false, // або true, якщо дозволяєш 18+
+        'vote_average.gte' => 5,
+        'vote_count.gte' =>200, // мінімум голосів для достовірності
     ]);
 }

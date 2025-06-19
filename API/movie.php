@@ -36,7 +36,7 @@ if (!empty($video['results'])) {
 
 <body>
     <header class="main-header">
-<h1 class="app-title"><a href="index.php">VibeMatch</a></h1>
+<h1 class="app-title"><a href="index.php">VIBEMATCH</a></h1>
 
         <nav class="header-nav">
             <?php if (!$isLoggedIn):?>

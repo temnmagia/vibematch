@@ -1,6 +1,7 @@
 /* Імпорт шрифту */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 
+
 /* Змінні кольорів - Відмова від неону */
 :root {
     --color-primary-dark: #2A0A33; /* Глибокий фіолетовий */
@@ -229,10 +230,13 @@ a {
     margin: 0;
     font-size: 2.2rem;
     color: var(--color-primary-medium);
-    font-weight: 700;
-    text-shadow: 0 0 3px rgba(138, 43, 226, 0.3); /* Тінь без світіння */
+    font-weight: 1000;
+    text-shadow: 0 0 3px rgba(138, 43, 226, 0.3); 
     cursor: pointer;
     transition: text-shadow var(--transition-speed);
+    letter-spacing: 2px;
+    font-weight: 300; 
+
 }
 
 .main-header .app-title:hover {

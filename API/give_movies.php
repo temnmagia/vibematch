@@ -145,7 +145,6 @@ foreach ($userGenres as $g) {
     }
 }
 if (empty($tmdbGenres)) return [];
-
 // 3. Отримуємо фільми з TMDb та додаємо в базу
 $page = 1;
 do {
@@ -183,7 +182,7 @@ $stmt->execute([
     }
 
     $page++;
-} while ($page <= ($response['total_pages'] ?? 1) && $page <= 2);
+} while ($page <= ($response['total_pages'] ?? 1) && $page <= 3);
 
 // 4. Витягуємо фільми з бази
 $stmt = $pdo->query("SELECT * FROM movies");
