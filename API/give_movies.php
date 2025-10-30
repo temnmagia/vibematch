@@ -1,24 +1,126 @@
 <?php
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
+// 1. ПЕРЕВІРКА АВТЕНТИФІКАЦІЇ (JWT)
+require_once 'auth_check.php'; // Використовуємо JWT для перевірки
 require_once 'db_connect.php';
 require_once 'TMDb_api.php';
 
-// 1. Отримуємо жанри з кешу або динамічно зі Spotify
-if (!isset($_SESSION['user_genres']) || empty($_SESSION['user_genres'])) {
-    $access_token = $_SESSION['spotify_token']['access_token'] ?? null;
-    if (!$access_token) return [];
+// 2. ЗАПУСК СЕСІЇ (для кешування даних, не для входу)
+// Ми все ще використовуємо сесії для кешування жанрів та показаних фільмів
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
-    function getUserTopArtists($token, $limit = 20) {
-        $url = "https://api.spotify.com/v1/me/top/artists?limit=$limit";
-        $opts = ["http" => ["header" => "Authorization: Bearer $token"]];
-        $context = stream_context_create($opts);
-        $response = file_get_contents($url, false, $context);
-        return json_decode($response, true);
+// 3. ПЕРЕВІРКА, ЧИ КОРИСТУВАЧ ЗАЛОГІНЕНИЙ
+if (!$IS_LOGGED_IN) {
+    return []; // Не залогінений, немає рекомендацій
+}
+
+// --- НОВА ЛОГІКА ОТРИМАННЯ ТА ОНОВЛЕННЯ ТОКЕНА ---
+
+/**
+ * Отримує новий токен доступу Spotify за допомогою refresh token.
+ */
+function refreshSpotifyToken($refresh_token, $pdo, $userId) {
+    $client_id = 'ff991d6f6c224110be45fa35a875b85b'; // Ваш client_id
+    
+    $data = [
+        'grant_type' => 'refresh_token',
+        'refresh_token' => $refresh_token,
+        'client_id' => $client_id
+    ];
+
+    $ch = curl_init('https://accounts.spotify.com/api/token'); // Token URL
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    $result = json_decode($response, true);
+
+    if ($httpCode !== 200 || !isset($result['access_token'])) {
+        error_log("Spotify token refresh failed for user $userId. HTTP: $httpCode. Response: $response");
+        // Можливо, refresh token недійсний. Видаляємо його, щоб уникнути циклу.
+        $pdo->prepare("UPDATE users SET spotify_refresh_token = NULL WHERE id = ?")->execute([$userId]);
+        return null;
     }
 
+    $new_access_token = $result['access_token'];
+    $new_expires_in = $result['expires_in'];
+    $new_expires_at = time() + $new_expires_in;
+    // Spotify може (але не завжди) видати новий refresh_token
+    $new_refresh_token = $result['refresh_token'] ?? $refresh_token; 
+
+    // Оновлюємо токени в базі даних
+    $stmt = $pdo->prepare(
+        "UPDATE users SET spotify_token = ?, spotify_token_expires = ?, spotify_refresh_token = ? WHERE id = ?"
+    );
+    $stmt->execute([$new_access_token, $new_expires_at, $new_refresh_token, $userId]);
+
+    return $new_access_token;
+}
+
+/**
+ * Отримує топ артистів користувача зі Spotify.
+ */
+function getUserTopArtists($token, $limit = 20) {
+    $url = "https://api.spotify.com/v1/me/top/artists?limit=$limit";
+    $opts = ["http" => [
+        "header" => "Authorization: Bearer $token",
+        "ignore_errors" => true // Дозволяє читати відповідь, навіть якщо це 401/403
+    ]];
+    $context = stream_context_create($opts);
+    $response = file_get_contents($url, false, $context);
+    
+    // Перевірка на помилку автентифікації (наприклад, токен прострочено)
+    if (strpos($http_response_header[0], '401') !== false || strpos($http_response_header[0], '403') !== false) {
+        return ['error' => 'auth_failed'];
+    }
+    
+    return json_decode($response, true);
+}
+
+
+// 4. ОТРИМУЄМО ТОКЕН З БАЗИ ДАНИХ
+$stmt = $pdo->prepare("SELECT spotify_token, spotify_token_expires, spotify_refresh_token FROM users WHERE id = ?");
+$stmt->execute([$CURRENT_USER_ID]);
+$userTokenData = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$userTokenData || !$userTokenData['spotify_refresh_token']) {
+    // Якщо немає токена або refresh_token, ми не можемо нічого зробити
+    return []; 
+}
+
+$access_token = $userTokenData['spotify_token'];
+$token_expires_at = $userTokenData['spotify_token_expires'];
+
+// 5. ПЕРЕВІРЯЄМО, ЧИ ТОКЕН ПРОСТРОЧЕНИЙ (або прострочиться в наступні 60 сек)
+if ($token_expires_at < (time() + 60)) {
+    $access_token = refreshSpotifyToken($userTokenData['spotify_refresh_token'], $pdo, $CURRENT_USER_ID);
+    if (!$access_token) {
+        // Оновлення не вдалося
+        return [];
+    }
+}
+
+// --- КІНЕЦЬ НОВОЇ ЛОГІКИ ТОКЕНА ---
+
+
+// 6. Отримуємо жанри з кешу або динамічно зі Spotify
+if (!isset($_SESSION['user_genres']) || empty($_SESSION['user_genres'])) {
+    
     $topArtistsData = getUserTopArtists($access_token);
+
+    // Якщо токен провалив валідацію ПІД ЧАС ЗАПИТУ (наприклад, був відкликаний)
+    if (isset($topArtistsData['error']) && $topArtistsData['error'] === 'auth_failed') {
+        // Примусово оновлюємо токен
+        $access_token = refreshSpotifyToken($userTokenData['spotify_refresh_token'], $pdo, $CURRENT_USER_ID);
+        if (!$access_token) return [];
+        
+        // Повторна спроба
+        $topArtistsData = getUserTopArtists($access_token);
+    }
+    
     if (empty($topArtistsData['items'])) return [];
 
     $allGenres = [];
@@ -35,7 +137,6 @@ if (!isset($_SESSION['user_genres']) || empty($_SESSION['user_genres'])) {
 
 $userGenres = $_SESSION['user_genres'] ?? [];
 if (empty($userGenres)) return [];
-
 // 2. Genre map (встав сюди повну мапу)
 $genreMap = [
     // Поп

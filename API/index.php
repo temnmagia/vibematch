@@ -1,12 +1,35 @@
 <?php
-session_start();
-$isLoggedIn = isset($_SESSION['spotify_token']);
+// session_start(); // ❌ ВИДАЛЕНО
+require_once 'auth_check.php'; // ✅ ДОДАНО
+
+// $isLoggedIn = isset($_SESSION['spotify_token']); // ❌ ВИДАЛЕНО
+$isLoggedIn = $IS_LOGGED_IN; // ✅ ЗМІНЕНО
+
+// Ми все ще використовуємо сесії для тимчасових даних, 
+// тому запускаємо session_start() ПІСЛЯ перевірки auth_check
+session_start(); // ✅ ДОДАНО (для $showMovies, $last_movies)
+
 $showMovies = $_SESSION['show_movies'] ?? false;
 $movies = $_SESSION['last_movies'] ?? [];
 
 // Обробка виходу
 if (isset($_POST['logout'])) {
+    // session_destroy(); // ❌ ВИДАЛЕНО
+    
+    // ✅ 1. Вбиваємо auth cookie
+    setcookie(
+        'auth_token', 
+        '', 
+        time() - 3600, // Минулий час
+        '/', 
+        '127.0.0.1', 
+        false, 
+        true
+    );
+    
+    // ✅ 2. Знищуємо сесію (для show_movies тощо)
     session_destroy();
+    
     header("Location: index.php");
     exit();
 }
@@ -17,7 +40,7 @@ if ($isLoggedIn && (isset($_POST['get_recommendations']) || isset($_POST['refres
     $_SESSION['shown_movie_ids'] = $_SESSION['shown_movie_ids'] ?? [];
 
     // Отримати нові фільми
-    $movies = include 'give_movies.php';
+    $movies = include 'give_movies.php'; // give_movies.php має також бути оновлений!
 
     // Зберегти в сесію
     $_SESSION['last_movies'] = $movies;
@@ -31,11 +54,6 @@ if ($isLoggedIn && (isset($_POST['get_recommendations']) || isset($_POST['refres
         }
     }
 }
-
-// Зауважте: якщо give_movies.php буде викликатися надто довго,
-// можливо, знадобиться AJAX-запит для кращого UX.
-// Але для поточної задачі достатньо такої логіки.
-
 ?>
 <!DOCTYPE html>
 <html lang="uk">
@@ -120,7 +138,7 @@ if ($isLoggedIn && (isset($_POST['get_recommendations']) || isset($_POST['refres
     </main>
 
     <script>
-        // Карусель фільмів
+        // Карусель фільмів (JS залишається без змін)
         const carousel = document.querySelector('.movies-carousel');
         let isDown = false;
         let startX;

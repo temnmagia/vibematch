@@ -1,17 +1,58 @@
 <?php
-session_start();
-if (!isset($_SESSION['spotify_token'])) {
+// session_start(); // ❌ ВИДАЛЕНО
+require_once 'auth_check.php'; // ✅ ДОДАНО
+require_once 'db_connect.php'; // ✅ ДОДАНО
+
+// if (!isset($_SESSION['spotify_token'])) { // ❌ ВИДАЛЕНО
+if (!$IS_LOGGED_IN) { // ✅ ЗМІНЕНО
     header("Location: index.php");
     exit();
 }
 
+// Ми можемо використовувати сесії для тимчасових даних (якщо потрібно),
+// але для виходу нам потрібно обробити і cookie, і сесію.
+session_start(); 
+
 if (isset($_POST['logout'])) {
+    // ✅ 1. Вбиваємо auth cookie
+    setcookie(
+        'auth_token', 
+        '', 
+        time() - 3600, // Минулий час
+        '/', 
+        '127.0.0.1', 
+        false, 
+        true
+    );
+    // ✅ 2. Знищуємо сесію
     session_destroy();
     header("Location: index.php");
     exit();
 }
 
-$token = $_SESSION['spotify_token']['access_token'];
+// 🚨 КРИТИЧНО: Отримуємо токен Spotify з БД, а не з сесії
+// $token = $_SESSION['spotify_token']['access_token']; // ❌ ВИДАЛЕНО
+
+$stmt = $pdo->prepare("SELECT spotify_token, spotify_token_expires, spotify_refresh_token FROM users WHERE id = ?");
+$stmt->execute([$CURRENT_USER_ID]);
+$userTokenData = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$userTokenData) {
+    die("Помилка: не знайдено дані токена для користувача.");
+}
+
+// 🔴 TODO: Додайте логіку оновлення токена тут
+// if ($userTokenData['spotify_token_expires'] < time()) {
+//     // 1. Використати $userTokenData['spotify_refresh_token'] для отримання нового access_token
+//     // 2. Зберегти новий access_token і новий expires_at в БД
+//     // 3. Встановити $token = new_access_token
+// } else {
+//     $token = $userTokenData['spotify_token'];
+// }
+// Наразі ми просто використовуємо те, що є в базі:
+$token = $userTokenData['spotify_token'];
+
+
 // Ліміт та період залишаються тільки для Spotify контенту
 $limit = $_GET['limit'] ?? 10;
 $time_range = $_GET['time_range'] ?? 'medium_term';
@@ -72,10 +113,10 @@ if ($tab === 'albums') {
     $topAlbums = array_slice($albumMap, 0, $limit);
 }
 
-// Завантаження обраних фільмів (завжди, без ліміту та фільтрів за періодом)
-require_once 'db_connect.php'; // Переконайтесь, що цей файл існує та підключається до БД
+// Завантаження обраних фільмів
 $favMovies = [];
-$userId = $_SESSION['user_id'] ?? null; // Припускаємо, що user_id встановлюється в сесії після входу
+// $userId = $_SESSION['user_id'] ?? null; // ❌ ВИДАЛЕНО
+$userId = $CURRENT_USER_ID; // ✅ ЗМІНЕНО
 
 if ($userId) {
     if (isset($pdo) && $pdo instanceof PDO) {

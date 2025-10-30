@@ -50,3 +50,7 @@ CREATE TABLE votes (
     UNIQUE (user_id, movie_id)
 );
 ALTER TABLE movies ADD 	COLUMN description_en TEXT;
+
+ALTER TABLE users
+ADD COLUMN spotify_refresh_token VARCHAR(255) NULL,
+ADD COLUMN spotify_token_expires INT(11) NULL;

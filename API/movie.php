@@ -1,14 +1,38 @@
 <?php
 require_once 'TMDb_api.php';
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
+// if (session_status() == PHP_SESSION_NONE) { // ❌ ВИДАЛЕНО
+//     session_start();
+// }
+require_once 'auth_check.php'; // ✅ ДОДАНО
+session_start(); // ✅ ДОДАНО (для форми виходу)
+
+if (isset($_POST['logout'])) {
+    // ✅ 1. Вбиваємо auth cookie
+    setcookie(
+        'auth_token', 
+        '', 
+        time() - 3600, // Минулий час
+        '/', 
+        '127.0.0.1', 
+        false, 
+        true
+    );
+    // ✅ 2. Знищуємо сесію
+    session_destroy();
+    header("Location: index.php");
+    exit();
 }
+
+
 if (!isset($_GET['id'])) {
     echo "Фільм не знайдено.";
     exit;
 }
-$isLoggedIn = isset($_SESSION['spotify_token']);
-$movieId = intval($_GET['id']);
+
+// $isLoggedIn = isset($_SESSION['spotify_token']); // ❌ ВИДАЛЕНО
+$isLoggedIn = $IS_LOGGED_IN; // ✅ ЗМІНЕНО
+
+$movieId = intval($_GET['id']); // Це TMDb ID
 $movie = tmdb_get_movie_details($movieId);
 $video = tmdb_get_movie_trailers($movieId);
 $trailerUrl = null;

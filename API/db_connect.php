@@ -1,6 +1,6 @@
 <?php
 $host = 'localhost';
-$dbname = 'vibematch';
+$dbname = 'vibematch_2';
 $user = 'root';
 $password = '1234';
 

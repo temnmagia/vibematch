@@ -1,31 +1,21 @@
 <?php
-session_start();
+// session_start(); // ❌ ВИДАЛЕНО
 require_once 'db_connect.php';
-
+require_once 'auth_check.php'; // ✅ ДОДАНО
 
 // Перевірка сесії і даних форми
-if (!isset($_SESSION['user_id'], $_POST['movie_id'], $_POST['vote'])) {
-    die("❌ Помилка: відсутні дані (user_id або movie_id або vote)");
+// if (!isset($_SESSION['user_id'], $_POST['movie_id'], $_POST['vote'])) { // ❌ ВИДАЛЕНО
+if (!$IS_LOGGED_IN || !isset($_POST['movie_id'], $_POST['vote'])) { // ✅ ЗМІНЕНО
+    die("❌ Помилка: відсутні дані або ви не авторизовані");
 }
 
-$userId = $_SESSION['user_id'];
-$tmdbId = (int) $_POST['movie_id']; // з форми приходить TMDb ID
+$userId = $CURRENT_USER_ID; // ✅ ЗМІНЕНО
+$localMovieId = (int) $_POST['movie_id']; // Це ЛОКАЛЬНИЙ ID з movie_actions.php
 $vote = (int) $_POST['vote'];
-
 
 // Перевірка значення голосу
 if (!in_array($vote, [-1, 1])) {
     die("❌ Недопустиме значення vote (має бути -1 або 1)");
-}
-
-// Знайти локальний ID фільму в базі за TMDb ID
-$stmt = $pdo->prepare("SELECT tmdb_id FROM movies WHERE id = ?");
-$stmt->execute([$tmdbId]);
-$localMovieId = $stmt->fetchColumn();
-
-
-if (!$localMovieId) {
-    die("❌ Фільм з TMDb ID $tmdbId не знайдено в таблиці movies");
 }
 
 // Перевірка, чи голос вже існує
@@ -47,6 +37,7 @@ if ($currentVote === false || $currentVote === null) {
     $stmt->execute([$vote, $userId, $localMovieId]);
 }
 
-$referer = $_SERVER['HTTP_REFERER'] ?? 'index.php';
+$referer = $_SERVER['HTTP_REFERER'] ?? '../index.php';
 header("Location: $referer");
 exit;
+?>
