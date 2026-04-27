@@ -1,85 +1,78 @@
 <?php
-// Цей файл підключається в movie.php, де вже є auth_check
-// Але db_connect потрібен тут
-require_once 'db_connect.php';
+// movie_actions.php — підключається в movie.php
+// Змінні $movieId, $IS_LOGGED_IN, $CURRENT_USER_ID вже доступні з movie.php
 
-if (!isset($movieId)) {
-    echo "<p style='color:red;'>Помилка: movieId не заданий (має прийти з movie.php)</p>";
-    return;
-}
+require_once __DIR__ . '/db_connect.php';
 
-// $movieId, що прийшов з movie.php, - це TMDb ID
-$TMDB_ID = $movieId; 
+if (!isset($movieId)) return;
 
-// Знаходимо наш ЛОКАЛЬНИЙ ID
+$TMDB_ID = (int)$movieId;
+
+// Локальний ID з нашої БД
 $stmt = $pdo->prepare("SELECT id FROM movies WHERE tmdb_id = ?");
 $stmt->execute([$TMDB_ID]);
-$localMovieId = $stmt->fetchColumn(); // Це локальний 'movies.id'
+$localMovieId = $stmt->fetchColumn();
 
-// $isLoggedIn = isset($_SESSION['spotify_token']); // ❌ ВИДАЛЕНО
-$isLoggedIn = $IS_LOGGED_IN; // ✅ ЗМІНЕНО (встановлено в movie.php)
-// $userId = $_SESSION['user_id'] ?? null; // ❌ ВИДАЛЕНО
-$userId = $CURRENT_USER_ID; // ✅ ЗМІНЕНО (встановлено в movie.php)
+$isLoggedIn = $IS_LOGGED_IN;
+$userId     = $CURRENT_USER_ID;
 
-$voteScore = 0;
-$userVote = 0;
+$voteScore  = 0;
+$userVote   = 0;
 $isFavorite = false;
 
 if ($isLoggedIn && $userId && $localMovieId) {
-    // Отримати загальний рейтинг
-    $stmt = $pdo->prepare("SELECT SUM(vote) FROM votes WHERE movie_id = ?");
-    $stmt->execute([$localMovieId]); // ✅ Використовуємо локальний ID
-    $voteScore = $stmt->fetchColumn() ?? 0;
+    $stmt = $pdo->prepare("SELECT COALESCE(SUM(vote),0) FROM votes WHERE movie_id = ?");
+    $stmt->execute([$localMovieId]);
+    $voteScore = (int)$stmt->fetchColumn();
 
-    // Отримати голос користувача
     $stmt = $pdo->prepare("SELECT vote FROM votes WHERE movie_id = ? AND user_id = ?");
-    $stmt->execute([$localMovieId, $userId]); // ✅ Використовуємо локальний ID
-    $userVote = $stmt->fetchColumn() ?? 0;
+    $stmt->execute([$localMovieId, $userId]);
+    $userVote = (int)($stmt->fetchColumn() ?: 0);
 
-    // Чи є в закладках
     $stmt = $pdo->prepare("SELECT 1 FROM favorites WHERE user_id = ? AND movie_id = ?");
-    $stmt->execute([$userId, $TMDB_ID]); // ✅ Використовуємо TMDb ID (згідно з toggle_favorite)
-    $isFavorite = $stmt->fetchColumn();
+    $stmt->execute([$userId, $TMDB_ID]);
+    $isFavorite = (bool)$stmt->fetchColumn();
+}
+
+if (!$isLoggedIn || !$localMovieId) {
+    if ($isLoggedIn) echo '<p style="color:#777; font-size:0.9em;">Рейтинги доступні незабаром.</p>';
+    return;
 }
 ?>
+<div style="display:flex; align-items:center; gap:12px;">
+    <!-- Голосування -->
+    <div style="display:flex; align-items:center; gap:4px;">
+        <form action="vote.php" method="post">
+            <input type="hidden" name="movie_id" value="<?= $localMovieId ?>">
+            <input type="hidden" name="vote" value="1">
+            <button type="submit" style="font-size:22px; background:none; border:none; color:<?= $userVote===1?'#a78bfa':'#555' ?>; cursor:pointer; padding:0;">⬆</button>
+        </form>
 
-<?php if ($isLoggedIn && $localMovieId): // Показуємо кнопки, тільки якщо фільм є в нашій базі ?>
-    <div style="
-        display: flex;
-        align-items: center;
-        justify-content:space-between;
-        gap: 10px;
-    ">
-        <div style="display: flex; align-items: center; gap: 0px;">
-            <form action="vote.php" method="post">
-                <input type="hidden" name="movie_id" value="<?= $localMovieId ?>"> <input type="hidden" name="vote" value="1">
-                <button type="submit"
-                        style="font-size: 24px; background: none; border: none; color: <?= $userVote == 1 ? '#8A2BE2' : '#ccc' ?>; cursor: pointer;">⬆</button>
-            </form>
+        <span style="font-size:18px; color:#fff; font-weight:700; min-width:30px; text-align:center;">
+            <?= ($voteScore >= 0 ? '+' : '') . $voteScore ?>
+        </span>
 
-            <div style="font-size: 20px; color: #fff; font-weight: bold;">
-                <?= ($voteScore >= 0 ? '+' : '') . $voteScore ?>
-            </div>
-
-            <form action="vote.php" method="post">
-                <input type="hidden" name="movie_id" value="<?= $localMovieId ?>"> <input type="hidden" name="vote" value="-1">
-                <button type="submit"
-                        style="font-size: 24px; background: none; border: none; color: <?= $userVote == -1 ? '#8A2BE2' : '#ccc' ?>; cursor: pointer;">⬇</button>
-            </form>
-        </div>
-
-        <form action="toggle_favorite.php" method="post">
-            <input type="hidden" name="movie_id" value="<?= $localMovieId ?>"> <button type="submit"
-                    style="background-color: <?= $isFavorite ? '#4A0050' : '#2A0A33' ?>;
-                           color: #fff;
-                           padding: 8px 16px;
-                           border-radius: 8px;
-                           border: 1px solid #8A2BE2;
-                           cursor: pointer;">
-                <?= $isFavorite ? '💜 У закладках' : '🤍 Додати в закладки' ?>
-            </button>
+        <form action="vote.php" method="post">
+            <input type="hidden" name="movie_id" value="<?= $localMovieId ?>">
+            <input type="hidden" name="vote" value="-1">
+            <button type="submit" style="font-size:22px; background:none; border:none; color:<?= $userVote===-1?'#a78bfa':'#555' ?>; cursor:pointer; padding:0;">⬇</button>
         </form>
     </div>
-<?php elseif ($isLoggedIn): ?>
-    <p style="color: #777; font-size: 0.9em;">Рейтинги та закладки будуть доступні незабаром.</p>
-<?php endif; ?>
+
+    <!-- Закладка -->
+    <form action="toggle_favorite.php" method="post">
+        <input type="hidden" name="movie_id" value="<?= $localMovieId ?>">
+        <button type="submit" style="
+            background: <?= $isFavorite ? '#4a1a6a' : '#1a0a24' ?>;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid <?= $isFavorite ? '#a78bfa' : '#3a1a4a' ?>;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        ">
+            <?= $isFavorite ? '💜 У закладках' : '🤍 Додати в закладки' ?>
+        </button>
+    </form>
+</div>

@@ -1,43 +1,60 @@
 <?php
-// session_start(); // ❌ ВИДАЛЕНО
-require_once 'db_connect.php';
-require_once 'auth_check.php'; // ✅ ДОДАНО
+require_once __DIR__ . '/auth_check.php';
+require_once __DIR__ . '/db_connect.php';
 
-// Перевірка сесії і даних форми
-// if (!isset($_SESSION['user_id'], $_POST['movie_id'], $_POST['vote'])) { // ❌ ВИДАЛЕНО
-if (!$IS_LOGGED_IN || !isset($_POST['movie_id'], $_POST['vote'])) { // ✅ ЗМІНЕНО
-    die("❌ Помилка: відсутні дані або ви не авторизовані");
+require_auth();
+
+$localMovieId = (int)($_POST['movie_id'] ?? 0);
+$vote         = (int)($_POST['vote']     ?? 0);
+
+if (!$localMovieId || !in_array($vote, [-1, 1])) {
+    die("❌ Невірні дані");
 }
 
-$userId = $CURRENT_USER_ID; // ✅ ЗМІНЕНО
-$localMovieId = (int) $_POST['movie_id']; // Це ЛОКАЛЬНИЙ ID з movie_actions.php
-$vote = (int) $_POST['vote'];
-
-// Перевірка значення голосу
-if (!in_array($vote, [-1, 1])) {
-    die("❌ Недопустиме значення vote (має бути -1 або 1)");
-}
-
-// Перевірка, чи голос вже існує
+// Поточний голос
 $stmt = $pdo->prepare("SELECT vote FROM votes WHERE user_id = ? AND movie_id = ?");
-$stmt->execute([$userId, $localMovieId]);
+$stmt->execute([$CURRENT_USER_ID, $localMovieId]);
 $currentVote = $stmt->fetchColumn();
 
-if ($currentVote === false || $currentVote === null) {
-    // Ще не голосував — вставити
-    $stmt = $pdo->prepare("INSERT INTO votes (user_id, movie_id, vote) VALUES (?, ?, ?)");
-    $stmt->execute([$userId, $localMovieId, $vote]);
+// Отримуємо tmdb_id для activity_feed
+$stmt = $pdo->prepare("SELECT tmdb_id FROM movies WHERE id = ?");
+$stmt->execute([$localMovieId]);
+$tmdbId = $stmt->fetchColumn();
+
+if ($currentVote === false) {
+    // Новий голос
+    $pdo->prepare("INSERT INTO votes (user_id, movie_id, vote) VALUES (?, ?, ?)")
+        ->execute([$CURRENT_USER_ID, $localMovieId, $vote]);
+
+    if ($tmdbId) {
+        $type = $vote === 1 ? 'vote_up' : 'vote_down';
+        $pdo->prepare("INSERT INTO activity_feed (user_id, type, movie_id) VALUES (?, ?, ?)")
+            ->execute([$CURRENT_USER_ID, $type, $tmdbId]);
+    }
 } elseif ((int)$currentVote === $vote) {
-    // Натиснуто ту саму кнопку — скасувати голос
-    $stmt = $pdo->prepare("DELETE FROM votes WHERE user_id = ? AND movie_id = ?");
-    $stmt->execute([$userId, $localMovieId]);
+    // Скасувати голос
+    $pdo->prepare("DELETE FROM votes WHERE user_id = ? AND movie_id = ?")
+        ->execute([$CURRENT_USER_ID, $localMovieId]);
+
+    if ($tmdbId) {
+        $type = $vote === 1 ? 'vote_up' : 'vote_down';
+        $pdo->prepare("DELETE FROM activity_feed WHERE user_id = ? AND movie_id = ? AND type = ?")
+            ->execute([$CURRENT_USER_ID, $tmdbId, $type]);
+    }
 } else {
     // Зміна голосу
-    $stmt = $pdo->prepare("UPDATE votes SET vote = ? WHERE user_id = ? AND movie_id = ?");
-    $stmt->execute([$vote, $userId, $localMovieId]);
+    $pdo->prepare("UPDATE votes SET vote = ? WHERE user_id = ? AND movie_id = ?")
+        ->execute([$vote, $CURRENT_USER_ID, $localMovieId]);
+
+    if ($tmdbId) {
+        $oldType = $vote === 1 ? 'vote_down' : 'vote_up';
+        $newType = $vote === 1 ? 'vote_up'   : 'vote_down';
+        $pdo->prepare("DELETE FROM activity_feed WHERE user_id = ? AND movie_id = ? AND type = ?")
+            ->execute([$CURRENT_USER_ID, $tmdbId, $oldType]);
+        $pdo->prepare("INSERT INTO activity_feed (user_id, type, movie_id) VALUES (?, ?, ?)")
+            ->execute([$CURRENT_USER_ID, $newType, $tmdbId]);
+    }
 }
 
-$referer = $_SERVER['HTTP_REFERER'] ?? '../index.php';
-header("Location: $referer");
-exit;
-?>
+header('Location: ' . ($_SERVER['HTTP_REFERER'] ?? 'index.php'));
+exit();

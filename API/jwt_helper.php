@@ -1,41 +1,31 @@
 <?php
-require_once '../vendor/autoload.php'; // Path to your composer autoload
+require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/../vendor/autoload.php';
+
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
-define('JWT_SECRET_KEY', 'trafiuksuperduperkruta');
-define('JWT_ISSUER', 'http://127.0.0.1:80'); // Your domain
-define('JWT_AUDIENCE', 'http://127.0.0.1:80'); // Your domain
-
-function generate_jwt($userId, $email) {
-    $issuedAt = time();
-    $expirationTime = $issuedAt + (86400 * 30); // Token valid for 30 days
-    
+function generate_jwt(int $userId, string $email): string {
+    $now = time();
     $payload = [
-        'iss' => JWT_ISSUER,
-        'aud' => JWT_AUDIENCE,
-        'iat' => $issuedAt,
-        'nbf' => $issuedAt,
-        'exp' => $expirationTime,
+        'iss'  => JWT_ISSUER,
+        'aud'  => JWT_AUDIENCE,
+        'iat'  => $now,
+        'nbf'  => $now,
+        'exp'  => $now + JWT_TTL,
         'data' => [
             'userId' => $userId,
-            'email' => $email
-        ]
+            'email'  => $email,
+        ],
     ];
-
     return JWT::encode($payload, JWT_SECRET_KEY, 'HS256');
 }
 
-function validate_jwt($token) {
-    if (!$token) {
-        return null;
-    }
+function validate_jwt(?string $token): ?object {
+    if (!$token) return null;
     try {
-        $payload = JWT::decode($token, new Key(JWT_SECRET_KEY, 'HS256'));
-        return $payload;
-    } catch (Exception $e) {
-        // Token is invalid (expired, wrong signature, etc.)
+        return JWT::decode($token, new Key(JWT_SECRET_KEY, 'HS256'));
+    } catch (Exception) {
         return null;
     }
 }
-?>

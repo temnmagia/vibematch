@@ -1,40 +1,45 @@
 <?php
-// session_start(); // ❌ ВИДАЛЕНО
-require_once 'db_connect.php';
-require_once 'auth_check.php'; // ✅ ДОДАНО
+require_once __DIR__ . '/auth_check.php';
+require_once __DIR__ . '/db_connect.php';
 
-// if (!isset($_SESSION['user_id'], $_POST['movie_id'])) { // ❌ ВИДАЛЕНО
-if (!$IS_LOGGED_IN || !isset($_POST['movie_id'])) { // ✅ ЗМІНЕНО
-    header("Location: ../index.php");
-    exit;
+require_auth();
+
+$localMovieId = (int)($_POST['movie_id'] ?? 0);
+if (!$localMovieId) {
+    header('Location: index.php');
+    exit();
 }
 
-$userId = $CURRENT_USER_ID; // ✅ ЗМІНЕНО
-$localMovieId = (int) $_POST['movie_id']; // Це локальний ID з movie_actions.php
-
-// Потрібно отримати TMDB_ID, оскільки таблиця `favorites` використовує його
+// Знаходимо tmdb_id
 $stmt = $pdo->prepare("SELECT tmdb_id FROM movies WHERE id = ?");
 $stmt->execute([$localMovieId]);
-$TMDB_ID = $stmt->fetchColumn();
+$tmdbId = $stmt->fetchColumn();
 
-if (!$TMDB_ID) {
-    die("Помилка: фільм не знайдено.");
+if (!$tmdbId) {
+    header('Location: index.php');
+    exit();
 }
 
-// Перевіряємо, чи вже в закладках
+// Перевірка чи вже в закладках
 $stmt = $pdo->prepare("SELECT 1 FROM favorites WHERE user_id = ? AND movie_id = ?");
-$stmt->execute([$userId, $TMDB_ID]);
+$stmt->execute([$CURRENT_USER_ID, $tmdbId]);
 $exists = $stmt->fetchColumn();
 
 if ($exists) {
-    // Видалити з обраного
-    $pdo->prepare("DELETE FROM favorites WHERE user_id = ? AND movie_id = ?")->execute([$userId, $TMDB_ID]);
+    // Видалити з закладок
+    $pdo->prepare("DELETE FROM favorites WHERE user_id = ? AND movie_id = ?")
+        ->execute([$CURRENT_USER_ID, $tmdbId]);
+    // Видалити з activity_feed
+    $pdo->prepare("DELETE FROM activity_feed WHERE user_id = ? AND movie_id = ? AND type = 'favorite'")
+        ->execute([$CURRENT_USER_ID, $tmdbId]);
 } else {
-    // Додати в обране
-    $pdo->prepare("INSERT INTO favorites (user_id, movie_id) VALUES (?, ?)")->execute([$userId, $TMDB_ID]);
+    // Додати в закладки
+    $pdo->prepare("INSERT INTO favorites (user_id, movie_id) VALUES (?, ?)")
+        ->execute([$CURRENT_USER_ID, $tmdbId]);
+    // Записати в activity_feed
+    $pdo->prepare("INSERT INTO activity_feed (user_id, type, movie_id) VALUES (?, 'favorite', ?)")
+        ->execute([$CURRENT_USER_ID, $tmdbId]);
 }
 
-$referer = $_SERVER['HTTP_REFERER'] ?? '../index.php';
-header("Location: $referer");
-exit;
-?>
+header('Location: ' . ($_SERVER['HTTP_REFERER'] ?? 'index.php'));
+exit();

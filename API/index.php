@@ -1,170 +1,150 @@
 <?php
-// session_start(); // ❌ ВИДАЛЕНО
-require_once 'auth_check.php'; // ✅ ДОДАНО
+require_once __DIR__ . '/auth_check.php';
+session_start();
 
-// $isLoggedIn = isset($_SESSION['spotify_token']); // ❌ ВИДАЛЕНО
-$isLoggedIn = $IS_LOGGED_IN; // ✅ ЗМІНЕНО
+if (isset($_POST['logout'])) logout();
 
-// Ми все ще використовуємо сесії для тимчасових даних, 
-// тому запускаємо session_start() ПІСЛЯ перевірки auth_check
-session_start(); // ✅ ДОДАНО (для $showMovies, $last_movies)
-
+$isLoggedIn = $IS_LOGGED_IN;
 $showMovies = $_SESSION['show_movies'] ?? false;
-$movies = $_SESSION['last_movies'] ?? [];
+$movies     = $_SESSION['last_movies'] ?? [];
 
-// Обробка виходу
-if (isset($_POST['logout'])) {
-    // session_destroy(); // ❌ ВИДАЛЕНО
-    
-    // ✅ 1. Вбиваємо auth cookie
-    setcookie(
-        'auth_token', 
-        '', 
-        time() - 3600, // Минулий час
-        '/', 
-        '127.0.0.1', 
-        false, 
-        true
-    );
-    
-    // ✅ 2. Знищуємо сесію (для show_movies тощо)
-    session_destroy();
-    
-    header("Location: index.php");
-    exit();
-}
-
-// Якщо користувач увійшов і натиснув кнопку "Отримати рекомендації"
 if ($isLoggedIn && (isset($_POST['get_recommendations']) || isset($_POST['refresh_recommendations']))) {
-    // Ініціалізація масиву показаних фільмів
+    require_once __DIR__ . '/db_connect.php';
+
     $_SESSION['shown_movie_ids'] = $_SESSION['shown_movie_ids'] ?? [];
+    $movies = include __DIR__ . '/give_movies.php';
 
-    // Отримати нові фільми
-    $movies = include 'give_movies.php'; // give_movies.php має також бути оновлений!
-
-    // Зберегти в сесію
-    $_SESSION['last_movies'] = $movies;
-    $_SESSION['show_movies'] = true;
+    $_SESSION['last_movies']  = $movies;
+    $_SESSION['show_movies']  = true;
     $showMovies = true;
 
-    // Додати ID нових фільмів до списку показаних
     foreach ($movies as $m) {
-        if (isset($m['id']) && $m['id'] !== -1) {
+        if (!empty($m['id']) && $m['id'] !== -1) {
             $_SESSION['shown_movie_ids'][] = $m['id'];
         }
     }
+}
+
+// Кількість запитів дружби (для бейджа)
+$pendingFriends = 0;
+if ($isLoggedIn) {
+    require_once __DIR__ . '/db_connect.php';
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM friendships WHERE receiver_id = ? AND status = 'pending'");
+    $stmt->execute([$CURRENT_USER_ID]);
+    $pendingFriends = (int)$stmt->fetchColumn();
 }
 ?>
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8">
     <title>VibeMatch — Головна</title>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        .badge { display:inline-block; background:#7c3aed; color:#fff; font-size:0.7rem; padding:1px 6px; border-radius:10px; margin-left:5px; vertical-align:middle; }
+    </style>
 </head>
 <body>
     <header class="main-header">
-<h1 class="app-title"><a href="index.php">VibeMatch</a></h1>
-
+        <h1 class="app-title"><a href="index.php">VibeMatch</a></h1>
         <nav class="header-nav">
             <?php if (!$isLoggedIn): ?>
                 <a href="spotify_auth.php" class="btn auth-btn">Авторизуватись</a>
             <?php else: ?>
-    <div class="dropdown">
-        <a href="cabinet.php" class="btn cabinet-btn">Кабінет</a>
-        <div class="dropdown-content">
-            <a href="cabinet.php">Перейти в Кабінет</a>
-            <div class="dropdown-divider"></div>
-            <form method="post" class="dropdown-form-button">
-                <button type="submit" name="logout">Вийти</button>
-            </form>
-        </div>
-    </div>
-<?php endif; ?>
+                <a href="friends.php" class="btn" style="background:#2a1a4a;">
+                    👥 Друзі
+                    <?php if ($pendingFriends > 0): ?>
+                        <span class="badge"><?= $pendingFriends ?></span>
+                    <?php endif; ?>
+                </a>
+                <div class="dropdown">
+                    <a href="cabinet.php" class="btn cabinet-btn">Кабінет</a>
+                    <div class="dropdown-content">
+                        <a href="cabinet.php">Перейти в Кабінет</a>
+                        <a href="friends.php">Друзі</a>
+                        <div class="dropdown-divider"></div>
+                        <form method="post" class="dropdown-form-button">
+                            <button type="submit" name="logout">Вийти</button>
+                        </form>
+                    </div>
+                </div>
+            <?php endif; ?>
         </nav>
     </header>
 
     <main class="main-content">
         <div class="intro-section">
             <h2>Ласкаво просимо у <span class="highlight">VibeMatch</span></h2>
-            <p>Розкрийте фільми, що резонують з вашими таємними музичними вібраціями.</p>
+            <p>Розкрийте фільми, що резонують з вашими музичними вібраціями.</p>
         </div>
 
         <?php if (!$isLoggedIn): ?>
             <div class="message-card login-prompt">
-                <p>Щоб зануритися у світ персоналізованих рекомендацій, будь ласка, авторизуйтесь.</p>
+                <p>Щоб отримати персоналізовані рекомендації, будь ласка, авторизуйтесь через Spotify.</p>
                 <a href="spotify_auth.php" class="btn auth-btn">Увійти через Spotify</a>
             </div>
-        <?php else: /* Користувач авторизований */ ?>
-            <?php if (!$showMovies): /* Показуємо кнопку, якщо фільми ще не завантажені */ ?>
-                <div class="message-card recommendation-prompt">
-                    <p>Натисніть кнопку нижче, щоб отримати персоналізовані рекомендації фільмів на основі ваших музичних вподобань Spotify!</p>
-                    <form method="post">
-                        <button type="submit" name="get_recommendations" class="btn">Отримати рекомендації</button>
-                    </form>
-                </div>
-                
-            <?php elseif (empty($movies) || !is_array($movies)): /* Якщо фільми завантажені, але їх немає */ ?>
-                <div class="message-card no-recommendations">
-                    <p>На жаль, наразі немає фільмів, що відповідають вашим вібраціям. Продовжуйте слухати музику або перевірте дані в Кабінеті.</p>
-                </div>
-            <?php else: /* Якщо фільми завантажені і вони є */ ?>
-                <section class="movies-section">
-                    <form method="post">
+
+        <?php elseif (!$showMovies): ?>
+            <div class="message-card recommendation-prompt">
+                <p>Натисніть кнопку нижче, щоб отримати рекомендації фільмів на основі ваших музичних вподобань!</p>
+                <form method="post">
+                    <button type="submit" name="get_recommendations" class="btn">🎬 Отримати рекомендації</button>
+                </form>
+            </div>
+
+        <?php elseif (empty($movies) || !is_array($movies)): ?>
+            <div class="message-card no-recommendations">
+                <p>На жаль, наразі немає фільмів, що відповідають вашим вібраціям. Спробуйте пізніше або перевірте ваш Spotify.</p>
+                <form method="post">
+                    <button type="submit" name="get_recommendations" class="btn">🔄 Спробувати знову</button>
+                </form>
+            </div>
+
+        <?php else: ?>
+            <section class="movies-section">
+                <form method="post" style="margin-bottom:1rem;">
                     <button type="submit" name="refresh_recommendations" class="btn">🔄 Оновити рекомендації</button>
-                    </form>
-                    <h3>Ваші персональні рекомендації:</h3>
-                    <div class="movies-carousel">
-                        <?php foreach ($movies as $movie): ?>
-<a href="movie.php?id=<?= $movie['tmdb_id'] ?>" class="movie-slide">
-    <div class="movie-poster-wrapper">
-        <?php if (!empty($movie['image_url'])): ?>
-            <img src="<?= htmlspecialchars($movie['image_url']) ?>" alt="<?= htmlspecialchars($movie['title']) ?>" loading="lazy" class="movie-poster" />
-        <?php endif; ?>
-    </div>
-    <div class="movie-details">
-        <h4 class="movie-title"><?= htmlspecialchars($movie['title']) ?></h4>
-<p class="movie-description">
-    <?= nl2br(htmlspecialchars($movie['description'] ?: $movie['description_en'])) ?>
-</p>
-    </div>
-</a>
-                        <?php endforeach; ?>
-                    </div>
-                </section>
-            <?php endif; ?>
+                </form>
+                <h3>Ваші персональні рекомендації:</h3>
+                <div class="movies-carousel">
+                    <?php foreach ($movies as $movie): ?>
+                    <a href="movie.php?id=<?= $movie['tmdb_id'] ?>" class="movie-slide">
+                        <div class="movie-poster-wrapper">
+                            <?php if (!empty($movie['image_url'])): ?>
+                            <img src="<?= htmlspecialchars($movie['image_url']) ?>"
+                                 alt="<?= htmlspecialchars($movie['title']) ?>"
+                                 loading="lazy" class="movie-poster">
+                            <?php endif; ?>
+                        </div>
+                        <div class="movie-details">
+                            <h4 class="movie-title"><?= htmlspecialchars($movie['title']) ?></h4>
+                            <p class="movie-description">
+                                <?= nl2br(htmlspecialchars(mb_strimwidth($movie['description'] ?: $movie['description_en'], 0, 200, '…'))) ?>
+                            </p>
+                        </div>
+                    </a>
+                    <?php endforeach; ?>
+                </div>
+            </section>
         <?php endif; ?>
     </main>
 
     <script>
-        // Карусель фільмів (JS залишається без змін)
         const carousel = document.querySelector('.movies-carousel');
-        let isDown = false;
-        let startX;
-        let scrollLeft;
-
         if (carousel) {
-            carousel.addEventListener('mousedown', (e) => {
-                isDown = true;
-                carousel.classList.add('active-drag');
+            let isDown = false, startX, scrollLeft;
+            carousel.addEventListener('mousedown', e => {
+                isDown = true; carousel.classList.add('active-drag');
                 startX = e.pageX - carousel.offsetLeft;
                 scrollLeft = carousel.scrollLeft;
             });
-            carousel.addEventListener('mouseleave', () => {
-                isDown = false;
-                carousel.classList.remove('active-drag');
-            });
-            carousel.addEventListener('mouseup', () => {
-                isDown = false;
-                carousel.classList.remove('active-drag');
-            });
-            carousel.addEventListener('mousemove', (e) => {
+            carousel.addEventListener('mouseleave', () => { isDown = false; carousel.classList.remove('active-drag'); });
+            carousel.addEventListener('mouseup',    () => { isDown = false; carousel.classList.remove('active-drag'); });
+            carousel.addEventListener('mousemove',  e => {
                 if (!isDown) return;
                 e.preventDefault();
-                const x = e.pageX - carousel.offsetLeft;
-                const walk = (x - startX) * 2;
-                carousel.scrollLeft = scrollLeft - walk;
+                carousel.scrollLeft = scrollLeft - (e.pageX - carousel.offsetLeft - startX) * 2;
             });
         }
     </script>
