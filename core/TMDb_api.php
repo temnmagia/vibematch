@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/../config/config.php';
 
 function tmdb_api_request(string $endpoint, array $params = []): array {
     $params['api_key'] = TMDB_API_KEY;
@@ -31,13 +31,27 @@ function tmdb_get_movie_details(int $movieId): array {
     return $uk;
 }
 
-function tmdb_get_movies_by_genres(array $genreIds, int $page = 1): array {
+/**
+ * Discover movies by genre IDs.
+ *
+ * $minVotes threshold explained:
+ *   TMDb returns movies sorted by popularity, but "popularity" alone
+ *   includes newly-released or niche films with very few ratings.
+ *   vote_count.gte=100 ensures only movies that real audiences have
+ *   actually watched and rated come through — this is your "famousness" filter.
+ *   300 is a sweet spot: strict enough to cut obscure films,
+ *   loose enough not to miss cult classics or foreign cinema.
+ *   You can raise it to 500–1000 if you want only mainstream blockbusters.
+ */
+function tmdb_get_movies_by_genres(array $genreIds, int $page = 1, int $minVotes = 100): array {
     return tmdb_api_request('/discover/movie', [
-        'with_genres'   => implode(',', $genreIds),
-        'page'          => $page,
-        'language'      => 'uk-UA',
-        'sort_by'       => 'popularity.desc',
-        'include_adult' => false,
+        'with_genres'       => implode(',', $genreIds),
+        'page'              => $page,
+        'language'          => 'uk-UA',
+        'sort_by'           => 'popularity.desc',
+        'vote_count.gte'    => $minVotes,
+        'vote_average.gte'  => 5.5,   // soft floor — niche genres have fewer voters
+        'include_adult'     => false,
     ]);
 }
 

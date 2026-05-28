@@ -1,7 +1,7 @@
 <?php
 // friend_request.php — обробляє всі дії з дружбою (POST only)
-require_once __DIR__ . '/auth_check.php';
-require_once __DIR__ . '/db_connect.php';
+require_once __DIR__ . '/../core/auth_check.php';
+require_once __DIR__ . '/../config/db_connect.php';
 
 require_auth();
 
@@ -60,5 +60,15 @@ switch ($action) {
         break;
 }
 
+// --- Перевіряємо, чи це фоновий AJAX-запит ---
+$isAjax = !empty($_POST['is_ajax']);
+
+if ($isAjax) {
+    header('Content-Type: application/json');
+    echo json_encode(['success' => true, 'action' => $action]);
+    exit();
+}
+
+// Якщо це звичайний перехід (наприклад, зі сторінки профілю) - робимо редірект
 header("Location: $referer");
 exit();

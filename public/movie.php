@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/auth_check.php';
-require_once __DIR__ . '/TMDb_api.php';
+require_once __DIR__ . '/../core/auth_check.php';
+require_once __DIR__ . '/../core/TMDb_api.php';
 
 session_start();
 if (isset($_POST['logout'])) logout();
@@ -14,6 +14,12 @@ if (!isset($_GET['id'])) {
 
 $movieId = (int)$_GET['id'];
 $movie   = tmdb_get_movie_details($movieId);
+
+if (empty($movie['title'])) {
+    include __DIR__ . '/404.php';
+    exit();
+}
+
 $videos  = tmdb_get_movie_trailers($movieId);
 
 $trailerUrl = null;
@@ -27,54 +33,34 @@ foreach ($videos['results'] ?? [] as $v) {
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <title><?= htmlspecialchars($movie['title'] ?? 'Фільм') ?> — VibeMatch</title>
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <?php 
+    $pageTitle = htmlspecialchars($movie['title'] ?? 'Фільм') . " — VibeMatch";
+    include __DIR__ . '/../views/partials/head.php'; 
+    ?>
 </head>
 <body>
-<header class="main-header">
-    <h1 class="app-title"><a href="index.php">VibeMatch</a></h1>
-    <nav class="header-nav">
-        <?php if (!$isLoggedIn): ?>
-            <a href="spotify_auth.php" class="btn auth-btn">Авторизуватись</a>
-        <?php else: ?>
-            <a href="friends.php" class="btn" style="background:#2a1a4a;">👥 Друзі</a>
-            <div class="dropdown">
-                <a href="cabinet.php" class="btn cabinet-btn">Кабінет</a>
-                <div class="dropdown-content">
-                    <a href="cabinet.php">Перейти в Кабінет</a>
-                    <a href="friends.php">Друзі</a>
-                    <div class="dropdown-divider"></div>
-                    <form method="post" class="dropdown-form-button">
-                        <button type="submit" name="logout">Вийти</button>
-                    </form>
-                </div>
-            </div>
-        <?php endif; ?>
-    </nav>
-</header>
+    <?php include __DIR__ . '/../views/partials/header.php'; ?>
 
 <div class="main-content">
-    <div class="intro-section" style="text-align:left;">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+    <div class="intro-section movie-intro-section">
+        <div class="movie-page-header">
             <h2 style="margin:0; flex:1;">
                 <?= htmlspecialchars($movie['title']) ?>
                 (<?= substr($movie['release_date'] ?? '', 0, 4) ?>)
             </h2>
-            <div style="flex-shrink:0;">
-                <?php include __DIR__ . '/movie_actions.php'; ?>
+            <div class="movie-actions-wrapper">
+                <?php include __DIR__ . '/../views/partials/movie_actions.php'; ?>
             </div>
         </div>
 
-        <div style="display:flex; gap:30px; flex-wrap:wrap; margin-top:1.5rem;">
-            <div style="display:flex; align-items:flex-start;">
+        <div class="movie-details-wrapper">
+            <div class="movie-poster-container">
                 <img src="https://image.tmdb.org/t/p/w500<?= $movie['poster_path'] ?? '' ?>"
                      alt="Постер"
-                     style="width:300px; border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,0.5);">
+                     class="movie-poster-large">
             </div>
 
-            <div style="flex:1; min-width:250px;">
+            <div class="movie-info-block">
                 <p><strong>Жанр:</strong>
                     <?= htmlspecialchars(implode(', ', array_map(fn($g) => $g['name'], $movie['genres'] ?? []))) ?>
                 </p>
@@ -98,4 +84,6 @@ foreach ($videos['results'] ?? [] as $v) {
     </div>
 </div>
 </body>
+<script src="assets/app.js"></script>
 </html>
+

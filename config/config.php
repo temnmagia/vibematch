@@ -13,12 +13,12 @@ $host = $_SERVER['HTTP_HOST'];
 // Якщо ми локально (через localhost або просто 127.0.0.1 без порту), 
 // жорстко підміняємо адресу на ту, яку вимагає Spotify (:80)
 
-$base_url_dynamic = $protocol . $host . '/vibematch/API';
+$base_url_dynamic = $protocol . $host . '/vibematch';
 
 // --- Spotify ---
 define('SPOTIFY_CLIENT_ID',   'ff991d6f6c224110be45fa35a875b85b');
 // Тепер тут завжди буде 127.0.0.1:80 для локальної роботи, або ngrok для публічної
-define('SPOTIFY_REDIRECT_URI', $base_url_dynamic . '/callback.php');
+define('SPOTIFY_REDIRECT_URI', $base_url_dynamic . '/actions/callback.php');
 define('SPOTIFY_SCOPE',       'user-read-email user-top-read user-read-private');
 
 // --- TMDb ---

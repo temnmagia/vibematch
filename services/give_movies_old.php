@@ -1,96 +1,37 @@
 <?php
-// give_movies.php — повертає масив рекомендованих фільмів
+// give_movies.php — повертає масив рекомендованих фільмів з відсотком метчу
 // Підключається через include з index.php
-require_once __DIR__ . '/auth_check.php';
-require_once __DIR__ . '/db_connect.php';
-require_once __DIR__ . '/TMDb_api.php';
-require_once __DIR__ . '/config.php';
+
+// Оновлюємо шляхи, бо файли переїхали в папки core та config
+require_once __DIR__ . '/../core/auth_check.php';
+require_once __DIR__ . '/../config/db_connect.php';
+require_once __DIR__ . '/../core/TMDb_api.php';
+require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/spotify_service.php';
 
 if (session_status() === PHP_SESSION_NONE) session_start();
 if (!$IS_LOGGED_IN) return [];
 
-// -------------------------------------------------------
-// Оновлення токена Spotify
-// -------------------------------------------------------
-function refreshSpotifyToken(string $refreshToken, PDO $pdo, int $userId): ?string {
-    $ch = curl_init('https://accounts.spotify.com/api/token');
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_POSTFIELDS     => http_build_query([
-            'grant_type'    => 'refresh_token',
-            'refresh_token' => $refreshToken,
-            'client_id'     => SPOTIFY_CLIENT_ID,
-        ]),
-    ]);
-    $res      = json_decode(curl_exec($ch), true);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
 
-    if ($httpCode !== 200 || empty($res['access_token'])) {
-        error_log("Spotify refresh failed for user $userId");
-        $pdo->prepare("UPDATE users SET spotify_refresh_token = NULL WHERE id = ?")->execute([$userId]);
-        return null;
-    }
+// Отримуємо дійсний токен
+$accessToken = get_valid_spotify_token($pdo, $CURRENT_USER_ID);
 
-    $newToken   = $res['access_token'];
-    $newRefresh = $res['refresh_token'] ?? $refreshToken;
-    $newExpires = time() + ($res['expires_in'] ?? 3600);
+if (!$accessToken) return [];
 
-    $pdo->prepare("UPDATE users SET spotify_token = ?, spotify_token_expires = ?, spotify_refresh_token = ? WHERE id = ?")
-        ->execute([$newToken, $newExpires, $newRefresh, $userId]);
-
-    return $newToken;
-}
-
-function getUserTopArtists(string $token, int $limit = 20): array {
-    $url = "https://api.spotify.com/v1/me/top/artists?limit=$limit";
-    $res = @file_get_contents($url, false, stream_context_create([
-        "http" => ["header" => "Authorization: Bearer $token", "ignore_errors" => true]
-    ]));
-
-    if (!$res) return ['error' => 'auth_failed'];
-
-    // Перевіряємо HTTP статус
-    if (!empty($http_response_header) &&
-        (str_contains($http_response_header[0], '401') || str_contains($http_response_header[0], '403'))) {
-        return ['error' => 'auth_failed'];
-    }
-
-    return json_decode($res, true) ?? [];
-}
-
-// -------------------------------------------------------
-// Отримуємо токен
-// -------------------------------------------------------
-$stmt = $pdo->prepare("SELECT spotify_token, spotify_token_expires, spotify_refresh_token FROM users WHERE id = ?");
-$stmt->execute([$CURRENT_USER_ID]);
-$tokenData = $stmt->fetch();
-
-if (!$tokenData || !$tokenData['spotify_refresh_token']) return [];
-
-$accessToken = $tokenData['spotify_token'];
-
-if ($tokenData['spotify_token_expires'] < (time() + 60)) {
-    $accessToken = refreshSpotifyToken($tokenData['spotify_refresh_token'], $pdo, $CURRENT_USER_ID);
-    if (!$accessToken) return [];
-}
-
-// -------------------------------------------------------
-// Жанри з кешу або Spotify
-// -------------------------------------------------------
+// --- Жанри з кешу або Spotify ---
 if (empty($_SESSION['user_genres'])) {
-    $data = getUserTopArtists($accessToken);
+    $data = get_spotify_top_items($accessToken, 'artists');
 
+    // Якщо раптом токен протух саме в цю секунду (error від нашого сервісу)
     if (isset($data['error'])) {
-        $accessToken = refreshSpotifyToken($tokenData['spotify_refresh_token'], $pdo, $CURRENT_USER_ID);
-        if (!$accessToken) return [];
-        $data = getUserTopArtists($accessToken);
+        // Примусове оновлення можна було б зробити, але get_valid_spotify_token вже робить запас.
+        return [];
     }
 
-    if (empty($data['items'])) return [];
+    if (empty($data)) return [];
 
     $allGenres = [];
-    foreach ($data['items'] as $artist) {
+    foreach ($data as $artist) {
         foreach ($artist['genres'] as $genre) {
             $allGenres[] = $genre;
         }
@@ -105,7 +46,7 @@ $userGenres = $_SESSION['user_genres'] ?? [];
 if (empty($userGenres)) return [];
 
 // -------------------------------------------------------
-// Маппінг жанрів Spotify → TMDb genre IDs
+// РОЗШИРЕНА МАПА ЖАНРІВ: Spotify → TMDb genre IDs
 // -------------------------------------------------------
 $genreMap = [
     'pop'                  => [35, 10402],
@@ -182,24 +123,35 @@ $genreMap = [
     'italo disco'          => [10402, 35],
     'electro funk'         => [878, 10402],
     'blues rock'           => [36, 18],
-    'southern rock'        => [37, 80],
+    'southern rock'        => [37, 80]
 ];
 
-$tmdbGenres = [];
+// -------------------------------------------------------
+// ПОКРАЩЕНИЙ АЛГОРИТМ: Розрахунок ваги для кожного жанру TMDb
+// -------------------------------------------------------
+$tmdbGenreWeights = [];
+$currentWeight = 5; // ТОП-1 жанр отримує вагу 5, ТОП-2 — вагу 4 і т.д.
+$triggerGenresMap = []; // Запам'ятовуємо, яка саме музика викликала цей кіножанр
+
 foreach ($userGenres as $g) {
     $gLower = mb_strtolower(trim($g));
     if (isset($genreMap[$gLower])) {
-        foreach ($genreMap[$gLower] as $id) {
-            if (!in_array($id, $tmdbGenres)) $tmdbGenres[] = $id;
+        foreach ($genreMap[$gLower] as $tmdbId) {
+            if (!isset($tmdbGenreWeights[$tmdbId])) {
+                $tmdbGenreWeights[$tmdbId] = 0;
+            }
+            $tmdbGenreWeights[$tmdbId] += $currentWeight;
+            $triggerGenresMap[$tmdbId] = $g; // Для контексту в картці
         }
     }
+    $currentWeight--;
+    if ($currentWeight <= 0) break;
 }
 
+$tmdbGenres = array_keys($tmdbGenreWeights);
 if (empty($tmdbGenres)) return [];
 
-// -------------------------------------------------------
-// Завантажуємо фільми з TMDb та зберігаємо в БД
-// -------------------------------------------------------
+// --- Завантажуємо фільми з TMDb та зберігаємо в БД ---
 for ($page = 1; $page <= 2; $page++) {
     $response = tmdb_get_movies_by_genres($tmdbGenres, $page);
     $results  = $response['results'] ?? [];
@@ -231,45 +183,51 @@ for ($page = 1; $page <= 2; $page++) {
             $movie['id'],
         ]);
     }
-
     if ($page >= ($response['total_pages'] ?? 1)) break;
 }
 
-// -------------------------------------------------------
-// Фільтрація та сортування
-// -------------------------------------------------------
+// --- Фільтрація та математика розрахунку відсотків (Match Score) ---
 $alreadyShown = $_SESSION['shown_movie_ids'] ?? [];
+$allMovies = $pdo->query("SELECT * FROM movies")->fetchAll();
 
-$stmt = $pdo->query("SELECT * FROM movies");
-$allMovies = $stmt->fetchAll();
+$maxPossibleScore = array_sum($tmdbGenreWeights) ?: 1;
 
-$filtered = [];
-foreach ($allMovies as $movie) {
-    if (in_array($movie['id'], $alreadyShown)) continue;
-    $movieGenres = array_map('intval', explode(',', $movie['genre'] ?? ''));
-    $overlap = array_intersect($movieGenres, $tmdbGenres);
-    if (count($overlap) > 0) {
-        $movie['relevance'] = count($overlap);
-        $filtered[] = $movie;
-    }
-}
-
-usort($filtered, fn($a, $b) => $b['relevance'] <=> $a['relevance']);
-
-// Скидання якщо всі переглянуті
-if (empty($filtered)) {
-    $_SESSION['shown_movie_ids'] = [];
-    $allMovies = $pdo->query("SELECT * FROM movies")->fetchAll();
-    $filtered = [];
-    foreach ($allMovies as $movie) {
+$processMovies = function($moviesList) use ($alreadyShown, $tmdbGenreWeights, $maxPossibleScore, $triggerGenresMap) {
+    $resultList = [];
+    foreach ($moviesList as $movie) {
+        if (in_array($movie['id'], $alreadyShown)) continue;
+        
         $movieGenres = array_map('intval', explode(',', $movie['genre'] ?? ''));
-        $overlap = array_intersect($movieGenres, $tmdbGenres);
-        if (count($overlap) > 0) {
-            $movie['relevance'] = count($overlap);
-            $filtered[] = $movie;
+        $movieScore = 0;
+        $primaryTrigger = 'Музичний мікс';
+
+        foreach ($movieGenres as $mg) {
+            if (isset($tmdbGenreWeights[$mg])) {
+                $movieScore += $tmdbGenreWeights[$mg];
+                $primaryTrigger = $triggerGenresMap[$mg]; // Беремо музичний жанр-тригер
+            }
+        }
+
+        if ($movieScore > 0) {
+            // Переводимо у відсотки
+            $matchPercent = round(($movieScore / $maxPossibleScore) * 100);
+            // Робимо буст, щоб інтерфейс виглядав привабливо (мінімум 65%, максимум 99%)
+            $movie['match_percent'] = min(max($matchPercent + 30, 65), 99);
+            $movie['trigger_genre'] = $primaryTrigger;
+            $resultList[] = $movie;
         }
     }
-    usort($filtered, fn($a, $b) => $b['relevance'] <=> $a['relevance']);
+    // Сортуємо: спочатку найбільший відсоток метчу
+    usort($resultList, fn($a, $b) => $b['match_percent'] <=> $a['match_percent']);
+    return $resultList;
+};
+
+$filtered = $processMovies($allMovies);
+
+// Скидання, якщо всі фільми вже переглянуті
+if (empty($filtered)) {
+    $_SESSION['shown_movie_ids'] = [];
+    $filtered = $processMovies($allMovies);
 }
 
 $top = array_slice($filtered, 0, 10);

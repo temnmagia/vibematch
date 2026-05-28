@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/auth_check.php';
-require_once __DIR__ . '/db_connect.php';
+require_once __DIR__ . '/../core/auth_check.php';
+require_once __DIR__ . '/../config/db_connect.php';
 
 require_auth();
 

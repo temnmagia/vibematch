@@ -1,0 +1,2758 @@
+/* ============================================================ */
+/* LIQUID GLASS — iOS 26 / GLASSMORPHISM DESIGN SYSTEM         */
+/* ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Neucha&family=Oswald:wght@500;700&family=Rubik+Mono+One&family=Russo+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@400;700;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=JetBrains+Mono:wght@400;700&family=Dela+Gothic+One&family=Jura:wght@400;600;700&family=Comfortaa:wght@600;700&display=swap');
+/* 1. Manrope — ідеальна заміна Outfit та SF Pro. Сучасний, чистий, як в iOS */
+.font-default  { font-family: 'Manrope', sans-serif; }
+
+/* 2. Unbounded — дуже широкий, трендовий шрифт. Ідеально для Glitch / Airbuds Vibe */
+.font-glitch   { font-family: 'Unbounded', sans-serif; text-transform: uppercase; letter-spacing: -1px; }
+
+/* 3. Playfair Display — класика з кирилицею. Виглядає як обкладинка журналу Vogue */
+.font-elegant  { font-family: 'Playfair Display', serif; font-style: italic; }
+
+/* 4. JetBrains Mono — найкращий хакерський/технічний шрифт */
+.font-tech     { font-family: 'JetBrains Mono', monospace; letter-spacing: -1px; }
+
+/* 5. Dela Gothic One — Екстремально товстий, "дутий" шрифт. Ідеально для Airbuds-заголовків */
+.font-bold     { font-family: 'Dela Gothic One', sans-serif; text-transform: uppercase; letter-spacing: -0.5px; }
+
+/* 6. Jura — квадратний, космічний/Sci-Fi шрифт */
+.font-space    { font-family: 'Jura', sans-serif; font-weight: 700; letter-spacing: -1px; }
+
+/* 7. (Бонус) Comfortaa — круглий і м'який, ідеальний для дружнього вайбу */
+.font-round    { font-family: 'Comfortaa', display; letter-spacing: -1px; }
+
+/* ── ЕКСТРЕМАЛЬНІ ВАЙБИ (Додатковий пак) ── */
+
+/* 8. Russo One — Кіберпанк, механіка, екшен. Дуже масивний і "квадратний". */
+.font-cyber    { font-family: 'Russo One', sans-serif; letter-spacing: 1px; }
+
+/* 9. Cormorant Garamond — Готика, дарк-фентезі, вампіри. Виглядає як з дуже дорогої старої книги (гострі засічки). */
+.font-gothic   { font-family: 'Cormorant Garamond', serif; font-size: 1.1em; } /* Він трохи дрібніший, тому робимо 1.1em */
+
+/* 10. Rubik Mono One — Максимально дутий, Y2K / Drain-естетика. Широкий як танк. */
+.font-drain    { font-family: 'Rubik Mono One', sans-serif; letter-spacing: -2px; }
+
+/* 11. Oswald — Кінематографічний, витягнутий угору. Класика для постерів трилерів та детективів. */
+.font-tall     { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 2px; }
+
+/* 12. Neucha — Хаос, інді-ігри, щоденник психопата. Виглядає як недбалий напис від руки маркером. */
+.font-chaos    { font-family: 'Neucha', cursive; font-size: 1.2em; }
+
+/* ── Кольорові змінні ── */
+:root {
+    /* Акцентний фіолетовий спектр */
+    --accent-violet:      #9B6DFF;
+    --accent-violet-deep: #6B3FE7;
+    --accent-violet-soft: #C4ADFF;
+    --accent-violet-glow: rgba(155, 109, 255, 0.35);
+    --accent-indigo:      #6366F1;
+    --accent-pink:        #E879F9;
+
+    /* Скло */
+    --glass-white-thin:  rgba(255, 255, 255, 0.04);
+    --glass-white-mid:   rgba(255, 255, 255, 0.08);
+    --glass-white-thick: rgba(255, 255, 255, 0.13);
+    --glass-border:      rgba(255, 255, 255, 0.10);
+    --glass-border-glow: rgba(155, 109, 255, 0.25);
+
+    /* Фон */
+    --bg-void:   #04040A;
+    --bg-deep:   #080810;
+    --bg-dark:   #0E0E1A;
+    --bg-mid:    #141424;
+    --bg-raise:  #1C1C30;
+
+    /* Текст */
+    --text-primary:   rgba(255, 255, 255, 0.92);
+    --text-secondary: rgba(255, 255, 255, 0.55);
+    --text-tertiary:  rgba(255, 255, 255, 0.30);
+    --text-accent:    var(--accent-violet-soft);
+
+    /* Радіуси */
+    --r-xs:  8px;
+    --r-sm:  12px;
+    --r-md:  18px;
+    --r-lg:  24px;
+    --r-xl:  32px;
+    --r-pill: 100px;
+
+    /* Тіні */
+    --shadow-glass:  0 8px 32px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-deep:   0 20px 60px rgba(0, 0, 0, 0.7), 0 4px 16px rgba(0, 0, 0, 0.4);
+    --shadow-violet: 0 8px 32px rgba(155, 109, 255, 0.20);
+    --shadow-inset:  inset 0 1px 0 rgba(255, 255, 255, 0.10);
+
+    /* Blur */
+    --blur-sm: blur(12px);
+    --blur-md: blur(20px);
+    --blur-lg: blur(32px);
+    --blur-xl: blur(48px);
+
+    /* Перехід */
+    --ease-glass:  0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --ease-spring: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ease-smooth: 0.25s ease-out;
+}
+
+
+/* ── Базові стилі ── */
+* { box-sizing: border-box; }
+
+
+
+body {
+    margin: 0;
+    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+    padding-top: env(safe-area-inset-top);
+    background-color: var(--bg-void);
+    color: var(--text-primary);
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    user-select: none;
+    overflow-x: hidden;
+    /* Stop users from selecting UI text */
+    -webkit-user-select: none;
+    user-select: none;
+    
+    /* Remove the ugly grey tap highlight on Android/iOS */
+    -webkit-tap-highlight-color: transparent;
+    
+    /* Stop the iOS magnifying glass and popup menus on long-press */
+    -webkit-touch-callout: none;
+    
+    /* Stop the whole page from "rubber-banding" or showing a glow when scrolling past the edge */
+    overscroll-behavior-y: none;
+}
+
+/* Make sure users CAN still type in search bars or input fields! */
+input, textarea {
+    -webkit-user-select: auto;
+    user-select: auto;
+}
+
+/* Сітчаста текстура фону */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+        radial-gradient(ellipse 80% 60% at 20% -10%, rgba(107, 63, 231, 0.18) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 110%, rgba(232, 121, 249, 0.10) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 40% at 60% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+body > * { position: relative; z-index: 1; }
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* ── Скролбар ── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+    background: rgba(155, 109, 255, 0.3);
+    border-radius: var(--r-pill);
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(155, 109, 255, 0.55);
+}
+
+/* ── Анімації ── */
+@keyframes text-delicate-wave {
+    0%, 100% { transform: translateY(0); opacity: 1; }
+    50%       { transform: translateY(-1.5px); opacity: 0.88; }
+}
+
+@keyframes drift1 {
+    0%   { transform: translate(0px,   0px)  scale(1.00) rotate(0deg);   }
+    20%  { transform: translate(60px,  35px) scale(1.08) rotate(5deg);   }
+    45%  { transform: translate(30px,  80px) scale(0.94) rotate(-4deg);  }
+    65%  { transform: translate(90px,  20px) scale(1.12) rotate(8deg);   }
+    80%  { transform: translate(50px,  55px) scale(1.03) rotate(-2deg);  }
+    100% { transform: translate(0px,   0px)  scale(1.00) rotate(0deg);   }
+}
+
+@keyframes drift2 {
+    0%   { transform: translate(0px,    0px)   scale(1.00) rotate(0deg);  }
+    25%  { transform: translate(-70px, -45px)  scale(1.10) rotate(-6deg); }
+    50%  { transform: translate(-35px, -85px)  scale(0.92) rotate(4deg);  }
+    75%  { transform: translate(-90px, -20px)  scale(1.07) rotate(-8deg); }
+    100% { transform: translate(0px,    0px)   scale(1.00) rotate(0deg);  }
+}
+
+@keyframes drift3 {
+    0%   { transform: translate(0px,   0px)  scale(1.00) rotate(0deg);   }
+    30%  { transform: translate(-55px, 45px) scale(1.15) rotate(18deg);  }
+    55%  { transform: translate(35px, -30px) scale(0.88) rotate(-12deg); }
+    80%  { transform: translate(-25px, 55px) scale(1.06) rotate(8deg);   }
+    100% { transform: translate(0px,   0px)  scale(1.00) rotate(0deg);   }
+}
+
+@keyframes drift4 {
+    0%   { transform: translate(0px,   0px)  scale(1.00); }
+    35%  { transform: translate(-65px, 55px) scale(1.20); }
+    70%  { transform: translate(40px,  30px) scale(0.85); }
+    100% { transform: translate(0px,   0px)  scale(1.00); }
+}
+
+@keyframes drift5 {
+    0%   { transform: translate(0px,  0px)  scale(1.00); }
+    28%  { transform: translate(55px, -40px) scale(1.28); }
+    58%  { transform: translate(-30px,-18px) scale(0.78); }
+    85%  { transform: translate(20px,  35px) scale(1.12); }
+    100% { transform: translate(0px,  0px)  scale(1.00); }
+}
+
+@keyframes shimmer {
+    0%   { background-position: -200% center; }
+    100% { background-position:  200% center; }
+}
+
+@keyframes popIn {
+    0%   { transform: scale(0) rotate(-30deg); opacity: 0; }
+    100% { transform: scale(1) rotate(-15deg); opacity: 1; }
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: scale(0.90) translateY(12px); }
+    to   { opacity: 1; transform: scale(1)   translateY(0); }
+}
+
+@keyframes liquid-pulse {
+    0%, 100% { box-shadow: var(--shadow-glass), 0 0 0 0 var(--accent-violet-glow); }
+    50%       { box-shadow: var(--shadow-glass), 0 0 0 8px transparent; }
+}
+
+/* ============================================================ */
+/* LIQUID GLASS UTILITY MIXIN                                   */
+/* ============================================================ */
+
+/* Базова скляна поверхня */
+.glass {
+    background:       var(--glass-white-thin);
+    backdrop-filter:  var(--blur-md);
+    -webkit-backdrop-filter: var(--blur-md);
+    border:           1px solid var(--glass-border);
+    box-shadow:       var(--shadow-glass), var(--shadow-inset);
+}
+
+/* ============================================================ */
+/* КНОПКИ                                                       */
+/* ============================================================ */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 11px 26px;
+    border-radius: var(--r-pill);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 0.88rem;
+    cursor: pointer;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    outline: none;
+    user-select: none;
+    position: relative;
+    overflow: hidden;
+    transition: all var(--ease-glass);
+
+    /* Liquid glass */
+    background:      rgba(155, 109, 255, 0.12);
+    backdrop-filter: var(--blur-sm);
+    -webkit-backdrop-filter: var(--blur-sm);
+    border:          1px solid rgba(155, 109, 255, 0.30);
+    color:           var(--text-primary);
+    box-shadow:      0 4px 16px rgba(0,0,0,0.3), var(--shadow-inset);
+}
+
+/* Світловий відблиск */
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%);
+    transition: left 0.5s ease;
+}
+.btn:hover::before { left: 100%; }
+
+.btn:hover {
+    background:  rgba(155, 109, 255, 0.22);
+    border-color: rgba(155, 109, 255, 0.55);
+    box-shadow:  0 8px 24px rgba(0,0,0,0.4), var(--shadow-violet), var(--shadow-inset);
+    transform:   translateY(-2px);
+}
+
+.btn:active { transform: translateY(0) scale(0.98); }
+
+.btn.accent {
+    background: linear-gradient(135deg, rgba(155, 109, 255, 0.3), rgba(232, 121, 249, 0.3));
+    border-color: var(--accent-violet-soft);
+}
+
+/* Logout */
+.logout-btn {
+    background:  rgba(255, 80, 80, 0.08);
+    border-color: rgba(255, 100, 100, 0.25);
+    color:       rgba(255, 180, 180, 0.9);
+}
+.logout-btn:hover {
+    background:  rgba(255, 80, 80, 0.18);
+    border-color: rgba(255, 100, 100, 0.5);
+    box-shadow:  0 8px 24px rgba(0,0,0,0.4), 0 0 20px rgba(255, 80, 80, 0.15);
+    color:       var(--text-primary);
+}
+
+/* Back / Cabinet */
+.back-btn, .cabinet-btn {
+    background:  var(--glass-white-thin);
+    border-color: var(--glass-border);
+    color:       var(--text-secondary);
+    box-shadow:  0 2px 8px rgba(0,0,0,0.25), var(--shadow-inset);
+}
+.back-btn:hover, .cabinet-btn:hover {
+    background:  var(--glass-white-mid);
+    border-color: var(--glass-border-glow);
+    color:       var(--text-primary);
+}
+
+/* ============================================================ */
+/* DROPDOWN                                                     */
+/* ============================================================ */
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: block;
+    position: absolute;
+    min-width: 200px;
+    z-index: 10;
+    right: 0;
+    padding: 6px;
+
+    /* Liquid glass */
+    background:      rgba(12, 10, 28, 0.70);
+    backdrop-filter: var(--blur-lg);
+    -webkit-backdrop-filter: var(--blur-lg);
+    border:          1px solid var(--glass-border);
+    border-radius:   var(--r-lg);
+    box-shadow:      var(--shadow-deep), var(--shadow-inset);
+
+    transform:   translateY(8px) scale(0.97);
+    opacity:     0;
+    visibility:  hidden;
+    transition:  opacity var(--ease-glass), transform var(--ease-spring), visibility var(--ease-glass);
+    overflow: hidden;
+}
+
+.dropdown-content a,
+.dropdown-content form button {
+    color:         var(--text-primary);
+    padding:       10px 14px;
+    text-decoration: none;
+    display:       block;
+    background:    none;
+    border:        none;
+    width:         100%;
+    text-align:    left;
+    cursor:        pointer;
+    font-size:     0.88rem;
+    font-family:   'Outfit', sans-serif;
+    font-weight:   500;
+    transition:    background var(--ease-smooth), color var(--ease-smooth);
+    border-radius: var(--r-sm);
+    box-sizing:    border-box;
+    -webkit-appearance: none;
+    -moz-appearance:    none;
+    appearance:         none;
+    outline: none;
+}
+
+.dropdown-form-button {
+    margin: 0;
+    padding: 0;
+    display: block;
+}
+
+.dropdown-content a:hover,
+.dropdown-content form button:hover {
+    background: rgba(155, 109, 255, 0.12);
+    color:      var(--accent-violet-soft);
+}
+
+.dropdown-divider {
+    height: 1px;
+    background: var(--glass-border);
+    margin: 4px 8px;
+}
+
+.dropdown:hover .dropdown-content {
+    opacity:    1;
+    visibility: visible;
+    transform:  translateY(0) scale(1);
+}
+
+/* ============================================================ */
+/* ХЕДЕР                                                        */
+/* ============================================================ */
+
+/* ============================================================ */
+/* ХЕДЕР - Скляний Острів (Floating Island)                     */
+/* ============================================================ */
+
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    /* Робимо його компактнішим */
+    padding: 12px 24px; 
+    
+    /* Відриваємо від країв екрана і центруємо */
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    
+    /* Задаємо ширину (на телефонах буде 92%, на ПК максимум 1000px) */
+    width: 92%;
+    max-width: 1000px;
+    z-index: 1000;
+
+    /* Дизайн острова (Liquid Frosted Glass) */
+    background: rgba(12, 10, 28, 0.65); /* Трохи темніший для контрасту з фоном */
+    backdrop-filter: var(--blur-xl);
+    -webkit-backdrop-filter: var(--blur-xl);
+    
+    /* Головна фішка — форма пігулки */
+    border-radius: 0 0 var(--r-xl) var(--r-xl);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    border-left: 1px solid rgba(255, 255, 255, 0.12);
+    border-right: 1px solid rgba(255, 255, 255, 0.12);
+    
+    /* Глибока тінь, щоб острів "відірвався" від фону, + внутрішній блік */
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+                
+    transition: all var(--ease-spring);
+}
+
+.main-header.header-hidden {
+    /* -50% залишає його по центру, а -150% ховає його далеко вгору за екран */
+    transform: translate(-50%, -150%);
+    opacity: 0; /* Робить зникнення ще м'якшим */
+    pointer-events: none; /* Щоб на нього не можна було випадково клікнути, коли він ховається */
+}
+
+/* Кнопки в хедері робимо трохи компактнішими */
+.main-header .btn {
+    padding: 8px 20px;
+    font-size: 0.85rem;
+}
+
+.main-header .app-title {
+    margin:      0;
+    font-family: 'Outfit', sans-serif;
+    font-size:   2.1rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    cursor:      pointer;
+    transition:  all var(--ease-smooth);
+
+    /* Liquid shimmer текст */
+    background: linear-gradient(135deg, #C4ADFF 0%, #9B6DFF 40%, #E879F9 80%, #9B6DFF 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 4s linear infinite;
+}
+
+.main-header .app-title:hover {
+    animation: shimmer 1.5s linear infinite;
+    filter: brightness(1.15);
+}
+
+.header-nav {
+    display:     flex;
+    gap:         8px;
+    align-items: center;
+}
+
+
+/* ============================================================ */
+/* ГОЛОВНИЙ КОНТЕНТ                                             */
+/* ============================================================ */
+
+.main-content {
+    max-width: 1200px;
+    margin: 90px auto 50px auto;
+    padding:   0 20px;
+    text-align: center;
+    flex-grow: 1;
+}
+
+/* ── Intro ── */
+.intro-section {
+    border-radius: var(--r-xl);
+    padding:       48px 36px;
+    margin-bottom: 50px;
+    position:      relative;
+    overflow:      hidden;
+
+    background:      rgba(255, 255, 255, 0.03);
+    backdrop-filter: var(--blur-md);
+    -webkit-backdrop-filter: var(--blur-md);
+    border:          1px solid var(--glass-border);
+    box-shadow:      var(--shadow-deep), var(--shadow-inset);
+}
+
+/* Внутрішнє світіння */
+.intro-section::after {
+    content: '';
+    position: absolute;
+    top: -60%; left: 50%;
+    transform: translateX(-50%);
+    width: 70%; height: 100%;
+    background: radial-gradient(ellipse, rgba(155, 109, 255, 0.10) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.intro-section h2 {
+    color:         var(--text-primary);
+    margin-bottom: 16px;
+    font-size:     2.8rem;
+    font-weight:   700;
+    letter-spacing: -0.5px;
+    line-height:    1.2;
+}
+
+.intro-section p {
+    font-size:   1.1rem;
+    color:       var(--text-secondary);
+    line-height: 1.65;
+}
+
+.highlight {
+    background: linear-gradient(120deg, var(--accent-violet-soft), var(--accent-pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+}
+
+/* ── Message Card ── */
+.message-card {
+    border-radius: var(--r-lg);
+    padding:       32px;
+    margin-top:    30px;
+
+    background:      var(--glass-white-thin);
+    backdrop-filter: var(--blur-sm);
+    -webkit-backdrop-filter: var(--blur-sm);
+    border:          1px solid var(--glass-border);
+    box-shadow:      var(--shadow-glass), var(--shadow-inset);
+}
+
+.message-card p {
+    font-size:     1.05rem;
+    color:         var(--text-secondary);
+    line-height:   1.55;
+    margin-bottom: 20px;
+}
+
+/* ============================================================ */
+/* КАРУСЕЛЬ ФІЛЬМІВ                                             */
+/* ============================================================ */
+
+.movies-section h3 {
+    font-size:     1.9rem;
+    font-weight:   700;
+    margin-bottom: 30px;
+    text-align:    center;
+    letter-spacing: -0.3px;
+
+    background: linear-gradient(135deg, var(--accent-violet-soft), var(--accent-violet));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.movies-carousel {
+    display:    flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    padding:    15px 0;
+    gap:        24px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    cursor:     grab;
+    margin:     0 -20px;
+}
+.movies-carousel::-webkit-scrollbar { display: none; }
+.movies-carousel.active-drag { cursor: grabbing; }
+
+.movie-slide {
+    flex:            0 0 360px;
+    scroll-snap-align: center;
+    border-radius:   var(--r-xl);
+    padding:         20px;
+    display:         flex;
+    flex-direction:  column;
+    align-items:     center;
+    transition:      transform var(--ease-glass), box-shadow var(--ease-glass), border-color var(--ease-glass);
+
+    background:      rgba(255, 255, 255, 0.04);
+    backdrop-filter: var(--blur-md);
+    -webkit-backdrop-filter: var(--blur-md);
+    border:          1px solid var(--glass-border);
+    box-shadow:      var(--shadow-glass), var(--shadow-inset);
+}
+
+.movie-slide:hover {
+    transform:    translateY(-6px);
+    border-color: var(--glass-border-glow);
+    box-shadow:   var(--shadow-deep), var(--shadow-violet), var(--shadow-inset);
+}
+
+.movie-poster-wrapper {
+    width:           100%;
+    margin-bottom:   16px;
+    overflow:        hidden;
+    border-radius:   var(--r-md);
+    box-shadow:      0 4px 20px rgba(0,0,0,0.5);
+    border:          1px solid rgba(155, 109, 255, 0.15);
+    display:         flex;
+    justify-content: center;
+    align-items:     center;
+    padding:         2px;
+    background:      rgba(155, 109, 255, 0.05);
+}
+
+.movie-poster {
+    width:        100%;
+    height:       auto;
+    object-fit:   contain;
+    display:      block;
+    transition:   transform 0.5s ease;
+    border-radius: var(--r-sm);
+}
+.movie-slide:hover .movie-poster { transform: scale(1.04); }
+
+.movie-details {
+    text-align: left;
+    width:      100%;
+    flex-grow:  1;
+}
+
+.movie-title {
+    margin-bottom: 10px;
+    font-weight:   600;
+    font-size:     1.55rem;
+    color:         var(--text-primary);
+    line-height:   1.35;
+    letter-spacing: -0.2px;
+}
+
+.movie-description {
+    color:         var(--text-secondary);
+    font-size:     0.92rem;
+    line-height:   1.55;
+    user-select:   text;
+    max-height:    100px;
+    overflow-y:    auto;
+    padding-right: 5px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(155,109,255,0.25) transparent;
+}
+
+/* ============================================================ */
+/* КАБІНЕТ                                                      */
+/* ============================================================ */
+
+.cabinet-main {
+    max-width: 900px;
+    padding:   0 20px;
+    flex-grow: 1;
+    display:   flex;
+    gap:       2rem;
+    align-items: flex-start;
+}
+
+.spotify-content { flex: 1; min-width: 300px; }
+.movies-sidebar  { width: 300px; flex-shrink: 0; }
+
+/* ── Профіль ── */
+.user-profile {
+    display:       flex;
+    align-items:   center;
+    gap:           20px;
+    margin-bottom: 40px;
+    padding:       26px;
+    border-radius: var(--r-xl);
+
+    background:      rgba(255, 255, 255, 0.04);
+    backdrop-filter: var(--blur-md);
+    -webkit-backdrop-filter: var(--blur-md);
+    border:          1px solid var(--glass-border);
+    box-shadow:      var(--shadow-glass), var(--shadow-inset);
+}
+
+.user-profile.no-data {
+    justify-content: center;
+    padding:    30px;
+    color:      var(--text-tertiary);
+    border:     1px dashed var(--glass-border);
+}
+.user-profile.no-data p { margin: 0; font-weight: 500; font-size: 1rem; }
+
+.user-image {
+    border-radius: 50%;
+    width:         72px;
+    height:        72px;
+    object-fit:    cover;
+    border:        2px solid rgba(155, 109, 255, 0.5);
+    flex-shrink:   0;
+    box-shadow:    0 0 0 4px rgba(155, 109, 255, 0.10), 0 4px 16px rgba(0,0,0,0.4);
+}
+
+.user-details { text-align: left; }
+
+.user-name {
+    margin:         0;
+    font-size:      2rem;
+    font-weight:    700;
+    color:          var(--text-primary);
+    letter-spacing: -0.4px;
+}
+
+.user-email {
+    margin-top:  6px;
+    font-size:   0.88rem;
+    color:       var(--text-tertiary);
+}
+
+/* ── Вкладки ── */
+.tabs-navigation {
+    display:         flex;
+    flex-wrap:       wrap;
+    gap:             6px;
+    margin-bottom:   28px;
+    padding-bottom:  0;
+    border-bottom:   none;
+    justify-content: center;
+}
+
+.tab-item {
+    cursor:        pointer;
+    padding:       9px 18px;
+    color:         var(--text-secondary);
+    font-weight:   500;
+    font-size:     0.88rem;
+    border-radius: var(--r-sm);
+    transition:    all var(--ease-smooth);
+    position:      relative;
+    border:        1px solid transparent;
+    background:    transparent;
+}
+
+.tab-item::after { display: none; }
+
+.tab-item:hover {
+    background:  var(--glass-white-mid);
+    border-color: var(--glass-border);
+    color:       var(--text-primary);
+}
+
+.tab-item.active {
+    background:  rgba(155, 109, 255, 0.15);
+    border-color: rgba(155, 109, 255, 0.35);
+    color:       var(--accent-violet-soft);
+    font-weight: 600;
+    box-shadow:  0 2px 12px rgba(155, 109, 255, 0.12), var(--shadow-inset);
+}
+
+/* ── Фільтри ── */
+.filter-controls {
+    display:         flex;
+    gap:             20px;
+    margin-bottom:   36px;
+    color:           var(--text-secondary);
+    font-weight:     500;
+    align-items:     center;
+    justify-content: center;
+    flex-wrap:       wrap;
+}
+
+.filter-label {
+    display:     flex;
+    align-items: center;
+    gap:         10px;
+}
+
+.filter-select {
+    padding:          9px 36px 9px 14px;
+    background:       rgba(255, 255, 255, 0.05);
+    backdrop-filter:  var(--blur-sm);
+    -webkit-backdrop-filter: var(--blur-sm);
+    border-radius:    var(--r-sm);
+    color:            var(--text-primary);
+    border:           1px solid var(--glass-border);
+    cursor:           pointer;
+    font-weight:      500;
+    font-family:      'Outfit', sans-serif;
+    font-size:        0.9rem;
+    appearance:       none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239B6DFF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat:   no-repeat;
+    background-position: right 10px center;
+    background-size:     15px;
+    transition:          border-color var(--ease-smooth), box-shadow var(--ease-smooth);
+}
+.filter-select:hover  { border-color: var(--glass-border-glow); }
+.filter-select:focus  { outline: none; border-color: rgba(155,109,255,0.5); box-shadow: 0 0 0 3px rgba(155,109,255,0.12); }
+
+.filter-select option {
+    /* Використовуємо темний колір з твоїх змінних, оскільки напівпрозорість тут не спрацює */
+    background-color: var(--bg-mid); 
+    color: var(--text-primary);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 10px 14px;
+}
+
+/* Зміна кольору при наведенні або для вибраного елемента (підтримується не всіма браузерами) */
+.filter-select option:checked,
+.filter-select option:hover,
+.filter-select option:focus {
+    background-color: var(--accent-violet-deep);
+    color: #fff;
+}
+
+/* ── Списки ── */
+.content-display { padding-bottom: 20px; }
+
+.no-data-message {
+    text-align:    center;
+    color:         var(--text-tertiary);
+    padding:       36px;
+    border-radius: var(--r-lg);
+    background:    var(--glass-white-thin);
+    border:        1px dashed var(--glass-border);
+}
+
+.items-list {
+    list-style: none;
+    padding:    0;
+    margin:     0;
+    min-height: 400px;
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 8px;
+    display:    flex;
+    flex-direction: column;
+    gap:        10px;
+}
+
+/* ── Картка елемента ── */
+.item-card {
+    display:     flex;
+    align-items: center;
+    gap:         14px;
+    padding:     14px 18px;
+    border-radius: var(--r-md);
+    min-height:  80px;
+    transition:  transform var(--ease-glass), box-shadow var(--ease-glass), border-color var(--ease-glass);
+
+    background:      var(--glass-white-thin);
+    backdrop-filter: var(--blur-sm);
+    -webkit-backdrop-filter: var(--blur-sm);
+    border:          1px solid var(--glass-border);
+    box-shadow:      0 2px 8px rgba(0,0,0,0.25), var(--shadow-inset);
+}
+.item-card:hover {
+    transform:    translateY(-3px);
+    border-color: var(--glass-border-glow);
+    box-shadow:   0 8px 20px rgba(0,0,0,0.4), var(--shadow-violet), var(--shadow-inset);
+}
+
+.item-rank {
+    margin-left:      4px;
+    width:            30px;
+    height:           30px;
+    background:       rgba(155, 109, 255, 0.15);
+    border:           1px solid rgba(155, 109, 255, 0.25);
+    color:            var(--accent-violet-soft);
+    font-weight:      600;
+    border-radius:    50%;
+    display:          flex;
+    align-items:      center;
+    justify-content:  center;
+    flex-shrink:      0;
+    font-size:        0.85rem;
+}
+
+.item-link    { flex-shrink: 0; }
+.item-image   {
+    border-radius: var(--r-xs);
+    width:         60px;
+    height:        60px;
+    object-fit:    cover;
+    box-shadow:    0 2px 10px rgba(0,0,0,0.4);
+    border:        1px solid var(--glass-border);
+}
+
+.item-info {
+    display:        flex;
+    flex-direction: column;
+    text-align:     left;
+    flex-grow:      1;
+    min-width:      0;
+}
+
+.item-title {
+    font-size:     1.05rem;
+    margin-bottom: 3px;
+    font-weight:   500;
+    color:         var(--text-primary);
+    white-space:   nowrap;
+    overflow:      hidden;
+    text-overflow: ellipsis;
+}
+
+.item-subtitle {
+    font-size:     0.8rem;
+    color:         var(--text-tertiary);
+    white-space:   nowrap;
+    overflow:      hidden;
+    text-overflow: ellipsis;
+}
+
+/* ============================================================ */
+/* СПИСОК ЖАНРІВ (ПРОГРЕС-БАРИ)                                 */
+/* ============================================================ */
+
+.genre-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-right: 8px; /* Відступ для скролбару */
+    max-height: 60vh;
+    overflow-y: auto;
+}
+.genre-list::-webkit-scrollbar { width: 4px; }
+.genre-list::-webkit-scrollbar-thumb { background: rgba(155, 109, 255, 0.3); border-radius: var(--r-pill); }
+
+.genre-card {
+    position: relative;
+    min-height: 54px;
+    display: flex;
+    align-items: center;
+    border-radius: var(--r-sm);
+    overflow: hidden; /* Щоб заливка не вилазила за краї */
+    transition: transform var(--ease-glass), box-shadow var(--ease-glass);
+    
+    background: var(--glass-white-thin);
+    backdrop-filter: var(--blur-sm);
+    -webkit-backdrop-filter: var(--blur-sm);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), var(--shadow-inset);
+}
+
+.genre-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--glass-border-glow);
+    box-shadow: var(--shadow-violet), var(--shadow-inset);
+}
+
+/* Напівпрозора заливка (сам прогрес-бар) */
+.genre-progress {
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    /* Градієнт від фіолетового до рожевого з високою прозорістю */
+    background: linear-gradient(90deg, rgba(155, 109, 255, 0.25), rgba(232, 121, 249, 0.12));
+    border-right: 1px solid rgba(155, 109, 255, 0.35);
+    z-index: 0;
+    transition: width 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Контейнер для тексту, щоб він був ПОВЕРХ заливки */
+.genre-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0 16px;
+    gap: 16px;
+}
+
+.genre-rank {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    color: var(--accent-violet-soft);
+    font-size: 0.95rem;
+    width: 24px;
+    text-align: right;
+}
+
+.genre-name {
+    flex-grow: 1;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 1.05rem;
+    letter-spacing: -0.2px;
+}
+
+.genre-count {
+    background: rgba(12, 10, 28, 0.4);
+    padding: 4px 12px;
+    border-radius: var(--r-pill);
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    font-weight: 500;
+}
+
+/* ============================================================ */
+/* LIQUID FROSTED GLASS & SNAPPING FEED                         */
+/* ============================================================ */
+
+.snapping-active {
+    overflow:         hidden;
+    position:         relative;
+    background-color: var(--bg-void);
+}
+
+/* Фонові плями */
+.glass-bg {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: -1;
+    overflow: hidden;
+}
+.glass-shape {
+    position:      absolute;
+    border-radius: 50%;
+    filter:        blur(100px);
+    opacity:       0.42;
+    will-change:   transform;
+}
+.shape-1 {
+    width: 520px; height: 520px;
+    background: radial-gradient(circle, #7B3FE4 0%, #4a1a90 65%, transparent 100%);
+    top: -15%; left: -10%;
+    animation: drift1 20s ease-in-out infinite;
+}
+.shape-2 {
+    width: 620px; height: 620px;
+    background: radial-gradient(circle, #E879F9 0%, #8B2FC9 55%, transparent 100%);
+    bottom: -25%; right: -10%;
+    animation: drift2 26s ease-in-out infinite;
+    animation-delay: -6s;
+}
+.shape-3 {
+    width: 360px; height: 360px;
+    background: radial-gradient(circle, #6366f1 0%, #3730a3 60%, transparent 100%);
+    top: 38%; left: 56%;
+    animation: drift3 18s ease-in-out infinite;
+    animation-delay: -11s;
+}
+.shape-4 {
+    width: 260px; height: 260px;
+    background: radial-gradient(circle, #C4ADFF 0%, #7B3FE4 65%, transparent 100%);
+    top: 12%; right: 18%;
+    opacity: 0.30;
+    animation: drift4 15s ease-in-out infinite;
+    animation-delay: -4s;
+}
+.shape-5 {
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, #F0ABFC 0%, #a21caf 65%, transparent 100%);
+    bottom: 8%; left: 22%;
+    opacity: 0.28;
+    animation: drift5 22s ease-in-out infinite;
+    animation-delay: -9s;
+}
+
+/* Snap */
+.snap-container {
+    height:              100vh;
+    overflow-y:          auto;
+    scroll-snap-type:    y mandatory;
+    scroll-behavior:     smooth;
+    padding-top:         80px;
+    scroll-padding-top:  80px;
+    padding-bottom:      20px;
+    box-sizing:          border-box;
+    max-width:           500px;
+    margin:              0 auto;
+    -ms-overflow-style:  none;
+    scrollbar-width:     none;
+}
+.snap-container::-webkit-scrollbar { display: none; }
+
+.vertical-feed  { display: flex; flex-direction: column; gap: 0; }
+
+.snap-section {
+    scroll-snap-align: start;
+    display:           flex;
+    align-items:       center;
+    justify-content:   center;
+    min-height:        calc(100vh - 90px);
+    padding:           16px;
+    box-sizing:        border-box;
+}
+
+.refresh-section {
+    min-height:        auto;
+    padding:           20px 16px;
+    scroll-snap-align: center;
+}
+
+/* ── Скляна панель (картка) ── */
+.glass-panel {
+    background:      rgba(255, 255, 255, 0.05);
+    backdrop-filter: var(--blur-lg);
+    -webkit-backdrop-filter: var(--blur-lg);
+    border:          1px solid rgba(255, 255, 255, 0.10);
+    box-shadow:      0 20px 20px rgba(0, 0, 0, 0.7), 0 4px 16px rgba(0, 0, 0, 0.4);
+    border-radius:   32px;
+    width:           100%;
+    padding:         18px;
+    display:         flex;
+    flex-direction:  column;
+    gap:             16px;
+    box-sizing:      border-box;
+}
+
+/* ── Скляні кнопки ── */
+.glass-btn {
+    background:       rgba(255, 255, 255, 0.07) !important;
+    backdrop-filter:  var(--blur-sm);
+    -webkit-backdrop-filter: var(--blur-sm);
+    border:           1px solid rgba(255, 255, 255, 0.12) !important;
+    color:            var(--text-primary) !important;
+    box-shadow:       0 4px 15px rgba(0,0,0,0.2), var(--shadow-inset) !important;
+}
+.glass-btn:hover {
+    background:  rgba(255, 255, 255, 0.12) !important;
+    border-color: rgba(155, 109, 255, 0.40) !important;
+    box-shadow:  0 6px 20px rgba(0,0,0,0.3), var(--shadow-violet), var(--shadow-inset) !important;
+}
+
+/* Glow effect */
+.glow-effect { position: relative; overflow: hidden; }
+.glow-effect::before {
+    content: ''; position: absolute; top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(155,109,255,0.20) 0%, transparent 70%);
+    opacity: 0; transition: opacity 0.3s;
+}
+.glow-effect:hover::before { opacity: 1; }
+
+/* ── Vibe Card Header ── */
+.vibe-card-header {
+    display:     flex;
+    align-items: center;
+    gap:         12px;
+}
+
+.friend-avatar-placeholder {
+    width:         44px; height: 44px;
+    border-radius: 50%;
+    background:    rgba(155, 109, 255, 0.12);
+    backdrop-filter: blur(6px);
+    border:        1px solid rgba(155, 109, 255, 0.20);
+    display:       flex; align-items: center; justify-content: center;
+    font-size:     1.2rem; flex-shrink: 0;
+}
+
+.vibe-context p       { margin: 0; font-size: 0.92rem; color: var(--text-primary); font-weight: 600; }
+.vibe-context .time-ago { font-size: 0.78rem; color: var(--text-tertiary); }
+
+.trigger-highlight {
+    color: var(--accent-violet-soft);
+    text-shadow: 0 0 12px rgba(155, 109, 255, 0.50);
+}
+
+.glass-badge {
+    margin-left: auto;
+    background:  rgba(155, 109, 255, 0.18);
+    border:      1px solid rgba(155, 109, 255, 0.35);
+    color:       var(--text-primary);
+    padding:     6px 14px;
+    border-radius: var(--r-pill);
+    font-weight: 700;
+    font-size:   0.83rem;
+    backdrop-filter: blur(6px);
+}
+
+/* ── Постер ── */
+.vibe-card-content {
+    position:      relative;
+    border-radius: var(--r-lg);
+    overflow:      hidden;
+    flex-grow:     1;
+    min-height:    45vh;
+}
+.vibe-poster { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.glass-gradient {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: linear-gradient(to top, rgba(4,4,12,0.95) 0%, rgba(4,4,12,0.6) 55%, transparent 100%);
+    padding: 40px 18px 18px 18px;
+}
+.vibe-movie-title { margin: 0 0 6px; font-size: 1.5rem; font-weight: 700; color: white; letter-spacing: -0.2px; }
+.vibe-movie-desc  { margin: 0; font-size: 0.88rem; color: rgba(255,255,255,0.75); line-height: 1.45; }
+
+/* ── Дії ── */
+.vibe-card-actions {
+    display:         flex;
+    justify-content: space-between;
+    align-items:     center;
+    padding-top:     4px;
+}
+.reactions  { display: flex; gap: 8px; }
+.react-btn  { padding: 10px 16px; border-radius: var(--r-pill); font-size: 1.25rem; cursor: pointer; }
+.accuracy-btn { padding: 10px 18px; border-radius: var(--r-pill); font-weight: 600; cursor: pointer; }
+
+/* ============================================================ */
+/* CHAT DRAWER                                                  */
+/* ============================================================ */
+
+.chat-drawer {
+    position:    fixed;
+    bottom:      -100%;
+    left:        50%;
+    transform:   translateX(-50%);
+    width:       100%;
+    max-width:   500px;
+    height:      70vh;
+
+    background:      rgba(10, 8, 20, 0.65);
+    backdrop-filter: var(--blur-xl);
+    -webkit-backdrop-filter: var(--blur-xl);
+    border-top:   1px solid rgba(255, 255, 255, 0.14);
+    border-left:  1px solid rgba(255, 255, 255, 0.07);
+    border-right: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 36px 36px 0 0;
+    box-shadow:   0 -12px 50px rgba(0,0,0,0.65), 0 -1px 0 rgba(255,255,255,0.06);
+
+    z-index:        3000;
+    display:        flex;
+    flex-direction: column;
+    transition:     bottom 0.4s cubic-bezier(0.1, 0.8, 0.3, 1);
+}
+.chat-drawer.open { bottom: 0; }
+
+.chat-drawer-header {
+    display:         flex;
+    justify-content: space-between;
+    align-items:     center;
+    padding:         18px 24px;
+    border-bottom:   1px solid var(--glass-border);
+}
+
+.chat-friend-info { display: flex; align-items: center; gap: 12px; }
+
+.chat-friend-name {
+    margin: 0;
+    font-size:   1.05rem;
+    font-weight: 700;
+    color:       var(--text-primary);
+}
+
+.chat-avatar-placeholder {
+    width:         38px; height: 38px;
+    background:    rgba(155, 109, 255, 0.20);
+    border:        1px solid rgba(155, 109, 255, 0.30);
+    border-radius: 50%;
+    display:       flex; align-items: center; justify-content: center;
+    font-size:     1rem;
+}
+
+.chat-close-btn {
+    background:    rgba(255, 255, 255, 0.06);
+    border:        1px solid rgba(255, 255, 255, 0.10);
+    color:         var(--text-tertiary);
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    cursor:        pointer;
+    font-size:     0.9rem;
+    display:       flex; align-items: center; justify-content: center;
+    transition:    all var(--ease-smooth);
+}
+.chat-close-btn:hover { background: rgba(255,255,255,0.12); color: var(--text-primary); }
+
+/* Messages */
+.chat-messages {
+    flex-grow:      1;
+    overflow-y:     auto;
+    padding:        20px;
+    display:        flex;
+    flex-direction: column;
+    gap:            12px;
+}
+.chat-messages::-webkit-scrollbar { width: 3px; }
+.chat-messages::-webkit-scrollbar-thumb { background: rgba(155,109,255,0.20); border-radius: 2px; }
+
+.chat-loading, .chat-empty {
+    text-align: center;
+    color:      var(--text-tertiary);
+    font-size:  0.9rem;
+    margin:     auto;
+}
+
+.message-row    { display: flex; width: 100%; }
+.row-me         { justify-content: flex-end; }
+.row-friend     { justify-content: flex-start; }
+
+.message-bubble {
+    padding:      10px 16px;
+    border-radius: 20px;
+    max-width:    75%;
+    font-size:    0.90rem;
+    line-height:  1.45;
+    word-break:   break-word;
+}
+
+.bubble-me {
+    background:              linear-gradient(135deg, var(--accent-violet-deep), var(--accent-violet));
+    color:                   white;
+    border-bottom-right-radius: 5px;
+    box-shadow:              0 3px 12px rgba(107, 63, 231, 0.35);
+}
+
+.bubble-friend {
+    background:           rgba(255, 255, 255, 0.07);
+    border:               1px solid rgba(255, 255, 255, 0.07);
+    color:                var(--text-primary);
+    border-bottom-left-radius: 5px;
+    backdrop-filter:      blur(8px);
+}
+
+/* Input */
+.chat-input-area {
+    padding:          16px 20px;
+    display:          flex;
+    flex-direction:   column;
+    align-items:      stretch;
+    gap:              10px;
+    border-top:       1px solid var(--glass-border);
+    background:       rgba(4, 4, 12, 0.35);
+    backdrop-filter:  var(--blur-sm);
+    
+}
+
+.chat-input-area input {
+    flex-grow:       1;
+    background:      rgba(255, 255, 255, 0.06);
+    border:          1px solid var(--glass-border);
+    padding:         12px 18px;
+    border-radius:   var(--r-pill);
+    color:           var(--text-primary);
+    outline:         none;
+    font-family:     'Outfit', sans-serif;
+    font-size:       0.93rem;
+    transition:      border-color var(--ease-smooth), background var(--ease-smooth);
+}
+
+.chat-input-area,
+.chat-input-area input {
+    user-select: text !important;
+    -webkit-user-select: text !important;
+    touch-action: manipulation;
+    cursor: text;
+}
+
+.chat-input-area input:focus {
+    border-color: rgba(155,109,255,0.50);
+    background:   rgba(255, 255, 255, 0.09);
+    box-shadow:   0 0 0 3px rgba(155,109,255,0.10);
+}
+
+.chat-send-btn {
+    background:    var(--accent-violet);
+    border:        none;
+    color:         white;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    cursor:        pointer;
+    display:       flex; align-items: center; justify-content: center;
+    font-size:     1.1rem;
+    transition:    transform var(--ease-smooth), box-shadow var(--ease-smooth);
+    box-shadow:    0 4px 16px rgba(155, 109, 255, 0.35);
+    flex-shrink:   0;
+}
+.chat-send-btn:hover { transform: scale(1.08); box-shadow: 0 6px 24px rgba(155,109,255,0.50); }
+
+/* Цитата */
+.chat-context-preview {
+    background:   rgba(155, 109, 255, 0.15);
+    border-left:  3px solid var(--accent-violet-soft);
+    padding:      8px 12px;
+    border-radius: var(--r-xs);
+    font-size:    0.83rem;
+    color:        var(--text-secondary);
+    margin-bottom: 8px;
+    display:      flex;
+    justify-content: space-between;
+    align-items:  center;
+    backdrop-filter: blur(6px);
+}
+
+.clear-ctx-btn {
+    background: none; border: none; color: white; cursor: pointer; opacity: 0.5; font-weight: bold;
+}
+.clear-ctx-btn:hover { opacity: 1; }
+
+.msg-context-block {
+    background:   rgba(0,0,0,0.20);
+    padding:      6px 10px;
+    border-radius: var(--r-xs);
+    border-left:  3px solid rgba(255,255,255,0.4);
+    font-size:    0.78rem;
+    margin-bottom: 6px;
+    opacity:      0.88;
+}
+.bubble-friend .msg-context-block { border-left-color: var(--accent-violet); }
+
+/* ============================================================ */
+/* AIRBUDS CHAT MOVIE CARDS                                     */
+/* ============================================================ */
+
+.chat-airbuds-card {
+    background:   rgba(12, 10, 25, 0.85);
+    backdrop-filter: var(--blur-md);
+    border:       1px solid rgba(255,255,255,0.10);
+    border-radius: var(--r-md);
+    padding:      12px;
+    margin-bottom: 8px;
+    width:        220px;
+    position:     relative;
+    box-shadow:   var(--shadow-glass);
+}
+
+.chat-airbuds-header {
+    font-size:     0.73rem;
+    color:         var(--text-tertiary);
+    margin-bottom: 8px;
+    text-align:    left;
+}
+
+.chat-airbuds-content { display: flex; align-items: center; gap: 12px; }
+
+.chat-airbuds-poster {
+    width:         52px; height: 52px;
+    object-fit:    cover;
+    border-radius: var(--r-xs);
+    box-shadow:    0 2px 10px rgba(0,0,0,0.45);
+}
+
+.chat-airbuds-info {
+    display:        flex;
+    flex-direction: column;
+    text-align:     left;
+    font-size:      0.88rem;
+    color:          var(--text-primary);
+    line-height:    1.25;
+}
+
+.chat-floating-emoji {
+    position:  absolute;
+    top:       -15px;
+    left:      -15px;
+    font-size: 2.2rem;
+    transform: rotate(-15deg);
+    filter:    drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* ============================================================ */
+/* МОДАЛЬНЕ ВІКНО                                               */
+/* ============================================================ */
+
+.modal-backdrop {
+    position:        fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background:      rgba(4, 4, 12, 0.75);
+    backdrop-filter: var(--blur-lg);
+    -webkit-backdrop-filter: var(--blur-lg);
+    z-index:         2000;
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+}
+
+.modal-content {
+    max-width: 420px;
+    width:     90%;
+    padding:   2.2rem;
+    border-radius: var(--r-xl);
+    text-align: center;
+    animation: modalFadeIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    background:      rgba(14, 10, 28, 0.75);
+    backdrop-filter: var(--blur-xl);
+    -webkit-backdrop-filter: var(--blur-xl);
+    border:          1px solid rgba(255, 255, 255, 0.12);
+    box-shadow:      var(--shadow-deep), var(--shadow-inset),
+                     0 0 0 1px rgba(155,109,255,0.08);
+}
+
+.modal-content h3 {
+    margin:      0 0 12px;
+    color:       var(--accent-violet-soft);
+    font-size:   1.3rem;
+    font-weight: 700;
+}
+
+.modal-content p {
+    color:       var(--text-secondary);
+    font-size:   0.93rem;
+    line-height: 1.55;
+    margin:      0 0 1.6rem;
+}
+
+.modal-actions {
+    display:         flex;
+    gap:             12px;
+    justify-content: center;
+}
+
+.btn-danger-filled {
+    background:   rgba(239, 68, 68, 0.75) !important;
+    color:        white !important;
+    border-color: rgba(239, 68, 68, 0.60) !important;
+    backdrop-filter: var(--blur-sm);
+}
+.btn-danger-filled:hover {
+    background:  rgba(239, 68, 68, 0.95) !important;
+    box-shadow:  0 0 24px rgba(239, 68, 68, 0.35) !important;
+}
+
+/* ============================================================ */
+/* КНОПКИ ДІЙ З ФІЛЬМОМ                                        */
+/* ============================================================ */
+
+.movie-actions-container {
+    display:     flex;
+    align-items: center;
+    gap:         12px;
+}
+
+.vote-controls { display: flex; align-items: center; gap: 4px; }
+
+.btn-vote {
+    font-size:  22px;
+    background: none;
+    border:     none;
+    cursor:     pointer;
+    padding:    0;
+    transition: transform 0.18s;
+}
+.btn-vote:hover  { transform: scale(1.22); }
+.btn-vote.active   { color: var(--accent-violet-soft); filter: drop-shadow(0 0 6px rgba(155,109,255,0.6)); }
+.btn-vote.inactive { color: rgba(255,255,255,0.25); }
+
+.vote-score {
+    font-size:  18px;
+    color:      var(--text-primary);
+    font-weight: 700;
+    min-width:  32px;
+    text-align: center;
+}
+
+.btn-favorite-toggle {
+    padding:       9px 18px;
+    border-radius: var(--r-sm);
+    cursor:        pointer;
+    font-size:     0.88rem;
+    font-family:   'Outfit', sans-serif;
+    font-weight:   600;
+    transition:    all var(--ease-smooth);
+    backdrop-filter: var(--blur-sm);
+}
+.btn-favorite-toggle.saved {
+    background:  rgba(155, 109, 255, 0.20);
+    color:       var(--text-primary);
+    border:      1px solid rgba(155, 109, 255, 0.40);
+    box-shadow:  0 0 0 3px rgba(155,109,255,0.08);
+}
+.btn-favorite-toggle.unsaved {
+    background:  var(--glass-white-thin);
+    color:       var(--text-secondary);
+    border:      1px solid var(--glass-border);
+}
+.btn-favorite-toggle:hover {
+    box-shadow: 0 0 18px rgba(155, 109, 255, 0.25);
+    border-color: rgba(155,109,255,0.50);
+    color: var(--text-primary);
+}
+
+/* ── Сторінка фільму ── */
+.movie-intro-section { text-align: left; } /* Повертаємо базове вирівнювання */
+
+.movie-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.movie-details-wrapper {
+    display:    flex;
+    gap:        30px;
+    flex-wrap:  wrap;
+    margin-top: 1.5rem;
+    
+    /* 1. ДОДАЄМО ЦЕ: Забороняємо розтягувати постер по висоті трейлера */
+    align-items: flex-start; 
+}
+
+.movie-poster-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    max-width: 450px;
+}
+
+.movie-poster-large {
+    width:         100%;
+    height:        auto;
+    border-radius: var(--r-lg);
+    box-shadow:    var(--shadow-deep);
+    border:        1px solid var(--glass-border);
+    
+    /* 2. ДОДАЄМО ЦЕ: Залізобетонний захист від будь-яких спотворень пропорцій */
+    object-fit:    cover; 
+}
+
+.movie-info-block { flex: 1; min-width: 250px; }
+
+/* ── Профіль шапки ── */
+.profile-header-card {
+    margin-bottom: 2rem;
+    display:       flex;
+    align-items:   center;
+    gap:           1.5rem;
+    padding:       1.5rem;
+    border-radius: var(--r-lg);
+    flex-wrap:     wrap;
+
+    background:      rgba(255,255,255,0.04);
+    backdrop-filter: var(--blur-md);
+    -webkit-backdrop-filter: var(--blur-md);
+    border:          1px solid var(--glass-border);
+    box-shadow:      var(--shadow-glass), var(--shadow-inset);
+}
+
+.profile-avatar-large {
+    width:         72px; height: 72px;
+    border-radius: 50%;
+    border:        2px solid rgba(155,109,255,0.50);
+    object-fit:    cover;
+    box-shadow:    0 0 0 4px rgba(155,109,255,0.12);
+}
+
+.profile-avatar-placeholder {
+    width:           72px; height: 72px;
+    border-radius:   50%;
+    background:      rgba(155,109,255,0.15);
+    border:          2px solid rgba(155,109,255,0.30);
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    font-size:       2rem;
+    font-weight:     bold;
+    color:           var(--accent-violet-soft);
+}
+
+/* ============================================================ */
+/* СЕКЦІЯ КАРТОК (КАБІНЕТ)                                      */
+/* ============================================================ */
+
+.section-card {
+    background:    rgba(255,255,255,0.04);
+    backdrop-filter: var(--blur-sm);
+    -webkit-backdrop-filter: var(--blur-sm);
+    border:        1px solid var(--glass-border);
+    border-radius: var(--r-lg);
+    padding:       1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow:    var(--shadow-glass), var(--shadow-inset);
+}
+.section-card h3 { margin: 0 0 1rem; color: var(--accent-violet-soft); font-size: 1.05rem; font-weight: 600; }
+
+/* ── Рядки користувачів ── */
+.user-row {
+    display:     flex;
+    align-items: center;
+    gap:         12px;
+    padding:     10px 0;
+    border-bottom: 1px solid var(--glass-border);
+}
+.user-row:last-child { border-bottom: none; }
+
+.user-avatar {
+    width:           42px; height: 42px;
+    border-radius:   50%;
+    background:      rgba(155,109,255,0.15);
+    border:          1px solid rgba(155,109,255,0.25);
+    display:         flex; align-items: center; justify-content: center;
+    font-weight:     700;
+    color:           var(--accent-violet-soft);
+    font-size:       1.05rem;
+    flex-shrink:     0;
+    object-fit:      cover;
+}
+
+.user-info          { flex: 1; min-width: 0; }
+.user-info strong   { display: block; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-info small    { color: var(--text-tertiary); font-size: 0.78rem; }
+.user-actions       { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
+
+/* ── Кнопки дій ── */
+.btn-sm {
+    padding:       5px 13px;
+    border-radius: var(--r-sm);
+    border:        none;
+    cursor:        pointer;
+    font-size:     0.80rem;
+    font-weight:   600;
+    transition:    opacity 0.18s, transform 0.18s;
+    background:      rgba(155, 109, 255, 0.12);
+    backdrop-filter: var(--blur-sm);
+    -webkit-backdrop-filter: var(--blur-sm);
+    border:          1px solid rgba(155, 109, 255, 0.30);
+    color:           var(--text-primary);
+    box-shadow:      0 4px 16px rgba(0, 0, 0, 0.3), var(--shadow-inset);
+}
+.btn-sm:hover    { opacity: 0.85; transform: translateY(-1px); }
+.btn-add     { background: rgba(155, 109, 255, 0.312); color: #fff; }
+.btn-accept  { background: rgba(22, 163, 74, 0.475);  color: #fff; }
+.btn-reject  { background: rgba(153, 27, 27, 0.447);  color: #fff; }
+.btn-remove  { background: rgba(120, 23, 23, 0.505);   color: #e6e6e6; }
+.btn-pending { background: rgba(55,65,81,0.50);   color: rgba(255,255,255,0.4); cursor: default; }
+.btn-chat    { background: rgba(110, 54, 230, 0.105); color: #fff; }
+
+/* ── Пошук ── */
+.search-form { display: flex; gap: 8px; margin-bottom: 1rem; }
+.search-form input {
+    flex:         1;
+    padding:      9px 14px;
+    background:   rgba(255,255,255,0.05);
+    backdrop-filter: var(--blur-sm);
+    border:       1px solid var(--glass-border);
+    border-radius: var(--r-sm);
+    color:        var(--text-primary);
+    outline:      none;
+    font-family:  'Outfit', sans-serif;
+    font-size:    0.9rem;
+    transition:   border-color var(--ease-smooth);
+}
+.search-form input:focus { border-color: rgba(155,109,255,0.50); box-shadow: 0 0 0 3px rgba(155,109,255,0.10); }
+.search-form button {
+    padding:       9px 18px;
+    color:         #fff;
+    border:        none;
+    border-radius: var(--r-sm);
+    cursor:        pointer;
+    font-weight:   600;
+    font-family:   'Outfit', sans-serif;
+    background:      rgba(155, 109, 255, 0.12);
+    backdrop-filter: var(--blur-sm);
+    -webkit-backdrop-filter: var(--blur-sm);
+    border:          1px solid rgba(155, 109, 255, 0.30);
+    color:           var(--text-primary);
+    box-shadow:      0 4px 16px rgba(0, 0, 0, 0.3), var(--shadow-inset);
+    transition:    background var(--ease-smooth);
+}
+.search-form button:hover { background: rgba(155,109,255,0.95); }
+
+/* ============================================================ */
+/* AIRBUDS STYLE FEED (FULL SCREEN BORDERLESS)                  */
+/* ============================================================ */
+
+/* Контейнер на весь екран */
+.ab-feed-wrapper {
+    height: 100dvh;
+    width: 100vw;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    position: fixed; /* Щоб перекрити все тло */
+    top: 0; left: 0;
+    z-index: 10;
+    display: flex; /* Використовуємо flex для центрування */
+    flex-direction: column;
+}
+.ab-feed-wrapper::-webkit-scrollbar { display: none; }
+
+/* Окремий екран-снеп */
+.ab-snap-section {
+    flex: 0 0 100dvh; /* Кожна секція займає РІВНО 100% висоти вікна */
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 20px 10px 50px 10px;
+    box-sizing: border-box;
+}
+
+/* ── Топ: Заголовок та Аватарка ── */
+.ab-context-header {
+    text-align: center;
+    margin-bottom: 10px;
+    z-index: 20;
+}
+
+.ab-headline {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--accent-pink);
+    text-transform: lowercase;
+    letter-spacing: -1px;
+    margin: 0 0 -15px 0;
+    text-shadow: 0 4px 20px rgba(232, 121, 249, 0.4);
+}
+
+.ab-user-badge-wrapper {
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.ab-user-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: rgba(155, 109, 255, 0.15);
+    backdrop-filter: var(--blur-md);
+    border: 3px solid var(--bg-void); /* Зливається з фоном */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    z-index: 2;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+
+.ab-listen-pill {
+    background: var(--accent-pink);
+    color: white;
+    font-size: 0.85rem;
+    font-family: 'SF Pro Display', 'Outfit', sans-serif;
+    font-weight: 700;
+    padding: 5px 14px;
+    border-radius: var(--r-pill);
+    margin-top: -14px; /* Налізає на аватарку */
+    z-index: 3;
+    text-transform: lowercase;
+    box-shadow: 0 4px 12px rgba(232, 121, 249, 0.4);
+}
+
+/* ── Центр: Величезний Постер ── */
+.ab-media-wrapper {
+    position: relative;
+    width: 90vw; /* Адаптується під ширину екрана */
+    max-width: 340px;
+    aspect-ratio: 4 / 5; /* Кіношний формат */
+    margin-bottom: 30px;
+    z-index: 15;
+}
+
+.ab-poster {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 24px;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255,255,255,0.05);
+}
+
+/* ── Плаваючі Реакції (Навколо картинки) ── */
+.ab-floating-reactions {
+    position: absolute;
+    bottom: -28px; /* Налізають на нижню грань постера */
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    z-index: 20;
+}
+
+.ab-reaction-circle {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--glass-white-thick);
+    backdrop-filter: var(--blur-xl);
+    -webkit-backdrop-filter: var(--blur-xl);
+    border: 1px solid var(--glass-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    cursor: pointer;
+    transition: transform var(--ease-spring), border-color var(--ease-smooth);
+    box-shadow: var(--shadow-glass), var(--shadow-inset);
+}
+
+.ab-reaction-circle:hover {
+    transform: scale(1.15) translateY(-5px);
+    border-color: var(--glass-border-glow);
+    background: rgba(255,255,255,0.2);
+}
+
+/* ── Інфо (Назва) ── */
+.ab-info {
+    text-align: center;
+    z-index: 15;
+    /* Вмикаємо Flexbox */
+    display: flex;
+    
+    /* Шикуємо елементи в колонку (один під одним) */
+    flex-direction: column; 
+    
+    /* Тепер gap працює! Зміни значення на свій смак (наприклад, 4px, 8px, 12px) */
+    gap: 5px;
+}
+
+.ab-title {
+    display: inline-block; /* Потрібно для правильного rotate */
+    margin: 10px 0 0 0;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-origin: left center; /* Щоб нахил йшов від лівого краю */
+    font-size: clamp(1.2rem, 4vw, 1.6rem); /* Розмір автоматично підлаштовується */
+}
+
+.ab-subtitle {
+    font-size: 1.05rem;
+    color: var(--text-secondary);
+    margin: 0;
+    font-weight: 600;
+}
+
+/* ── Закріплена Нижня Панель (Actions) ── */
+.ab-actions-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    width: 100%;
+    max-width: 380px;
+    position: absolute;
+    bottom: 35px; /* Завжди прибита до низу екрану */
+    z-index: 30;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+.ab-btn {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: var(--blur-lg);
+    -webkit-backdrop-filter: var(--blur-lg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--r-pill);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--ease-glass);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4), var(--shadow-inset);
+}
+
+.ab-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--accent-violet-soft);
+    transform: translateY(-2px);
+}
+
+.ab-btn-icon {
+    width: 54px;
+    height: 54px;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+}
+
+.ab-btn-main {
+    flex-grow: 1;
+    height: 54px;
+    font-weight: 600;
+    font-size: 1rem;
+    gap: 8px;
+    font-family: 'Outfit', sans-serif;
+}
+
+@media (max-height: 800px) {
+    .ab-media-wrapper {
+        max-width: 300px; /* Трохи менший постер, якщо вікно низьке */
+    }
+}
+
+/* ============================================================ */
+/* FLYING EMOJI PARTICLES (AIRBUDS EFFECT)                      */
+/* ============================================================ */
+
+.ab-emoji-particle {
+    position: absolute;
+    bottom: 10%; /* Починають летіти трохи вище низу екрана */
+    pointer-events: none; /* Щоб не заважали клікати на кнопки */
+    z-index: 14; /* Будуть летіти ЗА постером, але ПЕРЕД фоном (якщо хочеш перед постером - став 50) */
+    opacity: 0;
+    animation: 
+        floatUp var(--duration-y, 3s) ease-in forwards, 
+        sway var(--duration-x, 2s) ease-in-out infinite alternate;
+}
+
+@keyframes floatUp {
+    0% { transform: translateY(0) scale(0.5); opacity: 0; }
+    10% { opacity: 1; transform: translateY(-50px) scale(1); }
+    80% { opacity: 0.8; }
+    100% { transform: translateY(-80vh) scale(1.5); opacity: 0; }
+}
+
+@keyframes sway {
+    from { margin-left: -25px; }
+    to { margin-left: 25px; }
+}
+
+/* ============================================================ */
+/* PINNED EMOJIS (ЗАКРІПЛЕНІ НАВКОЛО АВАТАРКИ)                  */
+/* ============================================================ */
+
+.ab-pinned-emoji {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -20px; /* Трохи збільшили відступ компенсації */
+    margin-left: -20px;
+    font-size: 1.9rem; /* БУЛО 1.3rem -> СТАЛО 1.9rem (вони тепер великі) */
+    z-index: 1; 
+    opacity: 0.85;
+    pointer-events: none;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6));
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.badge {
+    display:       inline-block;
+    background:    rgba(155,109,255,0.25);
+    border:        1px solid rgba(155,109,255,0.40);
+    color:         var(--accent-violet-soft);
+    font-size:     0.68rem;
+    padding:       2px 8px;
+    border-radius: var(--r-pill);
+    margin-left:   6px;
+    vertical-align: middle;
+}
+
+.empty-state { color: var(--text-tertiary); font-size: 0.88rem; padding: 0.5rem 0; }
+
+/* ── Кнопка "Following" ── */
+.btn-following {
+    width:           175px;
+    display:         inline-flex;
+    justify-content: center;
+    align-items:     center;
+    box-sizing:      border-box;
+    transition:      all 0.25s ease;
+    background:      rgba(155,109,255,0.12) !important;
+    border-color:    rgba(155,109,255,0.30) !important;
+    color:           var(--accent-violet-soft) !important;
+    backdrop-filter: var(--blur-sm);
+}
+.btn-following .text-hover { display: none; }
+.btn-following:hover {
+    background:  rgba(239,68,68,0.18) !important;
+    border-color: rgba(239,68,68,0.50) !important;
+    color:       #f87171 !important;
+}
+.btn-following:hover .text-normal { display: none; }
+.btn-following:hover .text-hover  { display: block; }
+
+/* ── Списки фільмів / вкладки ── */
+.friends-layout { display: flex; gap: 2rem; align-items: flex-start; flex-wrap: wrap; }
+.friends-main   { flex: 1; min-width: 320px; }
+.friends-feed   { width: 340px; flex-shrink: 0; }
+
+.movies-list     { list-style: none; padding: 0; margin: 0; }
+/* Update your existing .movie-list-item */
+/* 1. The Container boundary */
+.movie-list-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--glass-border);
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden; /* Force-stops anything from spilling out */
+}
+
+/* 2. The Flex child containing the text */
+.movie-list-item .movie-info {
+    flex: 1;
+    min-width: 0; /* CRITICAL: Allows flexbox to shrink below content size */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* CRITICAL: Enables text-overflow on children */
+    text-align: left; /* Fixes the weird centering leak on mobile */
+}
+
+
+.movie-list-item:last-child { border-bottom: none; }
+.movie-list-item img { width: 52px; height: 78px; object-fit: cover; border-radius: var(--r-xs); }
+/* 3. The Title (Forces single line with ...) */
+.movie-list-item .movie-info strong {
+    display: block;
+    color: var(--text-primary);
+    font-size: 0.88rem;
+    white-space: nowrap; 
+    overflow: hidden;    
+    text-overflow: ellipsis; 
+}
+/* Optional: Make the description fade out nicely after 2 lines instead of running forever */
+/* 4. The Description (Forces 2 lines max, then ...) */
+.movie-list-item .movie-info small {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    white-space: normal;
+    line-height: 1.3;
+    color: var(--text-tertiary);
+    font-size: 0.78rem;
+    word-break: break-word; /* Guaranteed wrap for super long unspaced words */
+}
+
+.movie-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem; }
+.movie-tab-btn {
+    background:    none;
+    border:        none;
+    color:         var(--text-tertiary);
+    font-size:     0.88rem;
+    font-weight:   600;
+    cursor:        pointer;
+    padding:       5px 12px;
+    border-radius: var(--r-sm);
+    font-family:   'Outfit', sans-serif;
+    transition:    all var(--ease-smooth);
+}
+.movie-tab-btn.active { background: rgba(155,109,255,0.15); color: var(--accent-violet-soft); }
+
+.remove-fav {
+    margin-left:   auto;
+    background:    transparent;
+    border:        1px solid rgba(248,113,113,0.25);
+    color:         #f87171;
+    border-radius: 50%;
+    width: 22px; height: 22px;
+    font-size:     13px;
+    cursor:        pointer;
+    flex-shrink:   0;
+    transition:    background var(--ease-smooth);
+}
+.remove-fav:hover { background: rgba(248,113,113,0.15); }
+
+body.chat-open .mobile-tab-bar {
+    display: none !important;
+}
+
+/* ── Хедер для мобайлу ── */
+.mobile-tab-bar {
+    display: none; 
+}
+
+/* ============================================================ */
+/* АДАПТИВНІСТЬ                                                 */
+/* ============================================================ */
+
+@media (max-width: 992px) {
+    .main-content { padding: 0 15px; }
+    .movies-carousel { margin: 0 -15px; gap: 18px; }
+    .movie-slide { flex: 0 0 320px; padding: 16px; }
+    .movie-title { font-size: 1.4rem; }
+    .movie-description { font-size: 0.88rem; }
+    .cabinet-main { padding: 0 15px; }
+    .user-name { font-size: 1.8rem; }
+    .tabs-navigation { gap: 8px; }
+    .tab-item { font-size: 0.84rem; }
+    .filter-controls { gap: 16px; }
+}
+
+@media (max-width: 768px) {
+        .chat-drawer {
+        height: 85dvh; /* taller on mobile so messages are visible */
+    }
+    .main-header .header-nav {
+            display: none !important;
+    }
+    .main-header {
+            display: none !important;
+    }
+    .main-header .btn {
+        padding: 6px 12px;
+        font-size: 0.75rem;
+    }
+    body {
+            padding-bottom: calc(env(safe-area-inset-bottom) + 90px);
+            background-color: var(--bg-void); /* ensure no bleed */
+    }
+    .mobile-tab-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        
+        position: fixed;
+        bottom: max(24px, calc(env(safe-area-inset-bottom) + 12px));
+        left: 50%;
+        transform: translateX(-50%);
+        
+        width: 92%;
+        max-width: 400px;
+        height: 64px;
+        padding: 0 8px;
+        border-radius: 100px;
+        z-index: 2000;
+
+        /* Темне матове скло */
+        background: #3a295569;
+        backdrop-filter: var(--blur-xl);
+        -webkit-backdrop-filter: var(--blur-xl);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    /* 5. Кнопки-іконки */
+    .tab-btn {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 48px;
+        border-radius: 100px;
+        color: rgba(255, 255, 255, 0.35); /* Неактивний тьмяний колір */
+        transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        position: relative;
+
+        /* 🛑 ADD THESE 3 LINES TO KILL THE WEB LINK BEHAVIOR 🛑 */
+        -webkit-touch-callout: none !important; /* Kills iOS link preview */
+        -webkit-user-select: none !important;   /* Kills text/icon selection */
+        -webkit-tap-highlight-color: transparent !important; /* Kills the blue tap flash */
+    }
+
+    .tab-btn svg {
+        width: 26px;
+        height: 26px;
+        fill: currentColor;
+    }
+
+    /* 🛑 The Native Press Highlight 🛑 */
+    .tab-btn:active {
+        transform: scale(0.9);
+        background: rgba(255, 255, 255, 0.10); /* Adds a subtle glass highlight instantly */
+        transition: all 0.05s ease; /* Very fast transition DOWN so the tap feels instantly responsive */
+    }
+
+    /* 6. Активний стан (світлий кружечок позаду іконки) */
+    .tab-btn.active {
+        color: var(--text-primary);
+        background: rgba(255, 255, 255, 0.12);
+    }
+
+    /* 7. Маленькі крапки сповіщень (як жовта крапка на твоєму скріні) */
+    .tab-badge {
+        position: absolute;
+        top: 8px;
+        right: calc(50% - 14px); /* Вираховуємо точну позицію біля іконки */
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        border: 2px solid #12101c; /* Колір фону панелі для створення "дірки" */
+    }
+.ab-snap-section {
+    flex: 0 0 100dvh;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* back to center — let absolute positioning handle the bar */
+    position: relative;
+    padding: 15px 10px 150px 10px; /* remove the huge bottom padding */
+    box-sizing: border-box;
+}
+    .ab-actions-bar {
+    position: absolute;
+    bottom: calc(max(88px, calc(env(safe-area-inset-bottom) + 100px)));
+    z-index: 30;
+}
+    /* 1. ФІКСИМО ДІРКУ ЗВЕРХУ: Прибираємо 90px margin, бо хедера більше немає */
+    .main-content {
+        margin: 20px auto 40px auto !important; 
+        min-height: 100dvh;
+    }
+
+    /* 2. Адаптуємо шапку фільму (заголовок + кнопки) */
+    .movie-page-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 15px;
+    }
+
+    .intro-section h2 {
+        font-size: 1.8rem;
+        text-align: center;
+    }
+
+    /* 3. Центруємо постер і зменшуємо його розмір */
+    .movie-details-wrapper {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .movie-poster-container {
+        max-width: 220px; /* Робимо постер акуратним на телефоні */
+    }
+
+    /* 4. Вирівнюємо текстовий блок */
+    .movie-info-block {
+        width: 100%;
+        text-align: center; /* Центруємо лейбли "Жанр", "Рейтинг" */
+    }
+
+    /* Сам опис фільму краще залишити по лівому краю для зручності читання */
+    .movie-info-block p {
+        text-align: left;
+        font-size: 0.95rem;
+    }
+    .main-header .app-title { font-size: 1.6rem; }
+    .intro-section { padding: 30px 20px; margin-bottom: 40px; }
+    .intro-section h2 { font-size: 2.1rem; }
+    .intro-section p  { font-size: 0.98rem; }
+    .movies-section h3 { font-size: 1.55rem; margin-bottom: 22px; }
+    .movies-carousel { margin: 0 -10px; gap: 14px; padding: 10px 0; }
+    .movie-slide { flex: 0 0 275px; padding: 14px; }
+    .movie-title { font-size: 1.25rem; }
+    .movie-description { font-size: 0.84rem; max-height: 80px; }
+    .user-profile { flex-direction: column; text-align: center; gap: 14px; padding: 20px; }
+    .user-name { font-size: 1.55rem; }
+    .user-image { width: 62px; height: 62px; }
+    .tabs-navigation { gap: 6px; }
+    .tab-item { font-size: 0.84rem; }
+    .filter-controls { flex-direction: row; gap: 12px; align-items: flex-start; }
+    .items-list { max-height: 55vh; min-height: 350px; padding-right: 6px; }
+    .item-card { padding: 12px 14px; gap: 10px; min-height: 70px; }
+    .item-rank { width: 28px; height: 28px; font-size: 0.85rem; }
+    .item-image { width: 52px; height: 52px; }
+    .item-title { font-size: 0.98rem; }
+    .item-subtitle { font-size: 0.74rem; }
+    .friends-feed { width: 100%; }
+    .cabinet-main { 
+        flex-direction: column; 
+        /* This forces ALL children to expand to the full screen width uniformly */
+        align-items: stretch; 
+    }
+    .spotify-content, 
+    .movies-sidebar { 
+        width: 100%; 
+        min-width: 0; /* Kills the 300px desktop minimum so it doesn't cause overflow */
+    }
+}
+
+@media (max-width: 480px) {
+    .main-header { padding: 10px 12px; }
+    .btn { padding: 9px 18px; font-size: 0.78rem; }
+    .intro-section { padding: 24px 14px; }
+    .intro-section h2 { font-size: 1.75rem; }
+    .intro-section p  { font-size: 0.88rem; }
+    .movies-carousel  { margin: 0 -5px; gap: 10px; padding: 5px 0; }
+    .movie-slide      { flex: 0 0 240px; padding: 10px; }
+    .movie-title      { font-size: 1.15rem; }
+    .movie-description { font-size: 0.80rem; max-height: 70px; }
+    .user-name  { font-size: 1.35rem; }
+    .user-image { width: 52px; height: 52px; }
+    .item-card  { padding: 10px 12px; gap: 8px; min-height: 60px; }
+    .item-rank  { width: 26px; height: 26px; font-size: 0.78rem; }
+    .item-image { width: 42px; height: 42px; }
+    .item-title    { font-size: 0.88rem; }
+    .item-subtitle { font-size: 0.70rem; }
+}
+
+/* --- СТИЛІ ДЛЯ СТОРІНКИ ДРУЗІВ (ЩОБ НЕ ПРОПАДАЛО) --- */
+
+.feed-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    align-items: center;
+}
+
+.feed-item:last-child { border-bottom: none; }
+
+.feed-poster {
+    width: 45px;
+    height: 65px;
+    object-fit: cover;
+    border-radius: var(--r-xs);
+    flex-shrink: 0;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.feed-poster-placeholder {
+    width: 45px;
+    height: 65px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--r-xs);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.feed-text {
+    flex: 1;
+    font-size: 0.88rem;
+    color: var(--text-primary);
+    line-height: 1.4;
+}
+
+.feed-text strong, em {
+    color: var(--accent-violet-soft);
+}
+.feed-text em {
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 600;
+}
+
+.feed-time {
+    color: var(--text-tertiary);
+    display: block;
+    margin-top: 4px;
+    font-weight: 600;
+}
+
+/* Контейнер */
+.brand-logo-wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    text-decoration: none;
+}
+
+/* 1. СПІЛЬНИЙ ГРАДІЄНТ: Робимо фіксований розмір (300px), а не % */ 
+.brand-text {
+    background: linear-gradient(135deg, #C4ADFF 0%, #9B6DFF 40%, #E879F9 80%, #9B6DFF 100%);
+    background-size: 300px auto; 
+}
+
+/* ========================================================
+   1. КОНТЕЙНЕР (Просто прозора коробка з анімацією ховеру)
+======================================================== */
+.brand-icon-shimmer {
+    display: inline-block;
+    width: 42px;
+    height: 42px;
+    position: relative; /* Важливо для позиціонування шарів */
+    
+    transform: scale(1.4) rotate(-5deg);
+    transition: transform 0.3s var(--ease-smooth);
+}
+
+/* ========================================================
+   2. НИЖНІЙ ШАР (Твоя картинка, яку ми робимо ЧБ)
+======================================================== */
+.brand-icon-shimmer::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    
+    background-image: url('../assets/logo.png'); /* Твій файл */
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    
+    /* Фільтр тепер застосовується ТІЛЬКИ до цього шару */
+    filter: grayscale(100%); 
+}
+
+/* ========================================================
+   3. ВЕРХНІЙ ШАР (Кольоровий градієнт, який накладається зверху)
+======================================================== */
+.brand-icon-shimmer::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+
+    /* Наш яскравий градієнт */
+    background: linear-gradient(135deg, #C4ADFF 0%, #9B6DFF 40%, #E879F9 80%, #9B6DFF 100%);
+    background-size: 300px auto;
+    animation: shimmer-icon 4s linear infinite;
+
+    /* Вирізаємо градієнт по формі логотипу */
+    -webkit-mask-image: url('../assets/logo.png');
+    mask-image: url('../assets/logo.png');
+    -webkit-mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+
+    /* Змішуємо кольори! */
+    mix-blend-mode: overlay; /* Або спробуй 'color', якщо 'overlay' буде занадто світлим */
+    opacity: 0.9;
+}
+
+
+/* 3. НАЛАШТУВАННЯ ТЕКСТУ */
+.brand-text {
+    font-family: 'Outfit', sans-serif;
+    font-size: 2.1rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    
+    /* Підключаємо анімацію ЗІ ЗСУВОМ */
+    animation: shimmer-text 4s linear infinite;
+}
+
+/* Ефект при наведенні мишки */
+.brand-logo-wrapper:hover .brand-icon-shimmer {
+    transform: scale(1.5) rotate(-10deg);
+}
+
+/* =========================================
+   4. МАГІЯ СИНХРОНІЗАЦІЇ (КЛЮЧОВІ КАДРИ)
+========================================= */
+
+/* Анімація іконки йде стандартно */
+@keyframes shimmer-icon {
+    0% { background-position: 300px center; }
+    100% { background-position: -300px center; }
+}
+
+/* Анімація тексту ідеально продовжує іконку. 
+   Зсув 50px = ширина іконки (38px) + відступ gap (12px). */
+@keyframes shimmer-text {
+    0% { background-position: calc(300px - 64px) center; }
+    100% { background-position: calc(-300px - 64px) center; }
+}
+
+/* ── ONBOARDING SCREEN ── */
+.onboarding-screen {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 60px 32px 48px;
+    background: #0d0d0d;
+    overflow: hidden;
+    z-index: 10;
+}
+
+/* Animated blobs */
+.ob-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.5;
+    animation: ob-float 8s ease-in-out infinite;
+}
+.ob-blob-1 {
+    width: 320px; height: 320px;
+    background: radial-gradient(circle, #5b21b6, transparent);
+    top: -80px; left: -80px;
+    animation-delay: 0s;
+}
+.ob-blob-2 {
+    width: 280px; height: 280px;
+    background: radial-gradient(circle, #7c3aed, transparent);
+    bottom: 100px; right: -60px;
+    animation-delay: -3s;
+}
+.ob-blob-3 {
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, #a855f7, transparent);
+    top: 40%; left: 30%;
+    animation-delay: -5s;
+}
+@keyframes ob-float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33%       { transform: translate(20px, -20px) scale(1.05); }
+    66%       { transform: translate(-15px, 15px) scale(0.95); }
+}
+
+/* Top section */
+.ob-top {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    z-index: 1;
+    animation: ob-fadein 0.8s ease both;
+}
+.ob-logo-wrap {
+    width: 150px; height: 150px;
+    border-radius: 24px;
+    overflow: visible;
+}
+.ob-logo {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    filter: 
+        drop-shadow(0 0 12px rgba(124, 58, 237, 0.9))
+        drop-shadow(0 0 30px rgba(168, 85, 247, 0.6))
+        drop-shadow(0 0 60px rgba(124, 58, 237, 0.3));
+}
+.ob-appname {
+    font-size: 2.4rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin: 0;
+    background: linear-gradient(135deg, #C4ADFF 0%, #9B6DFF 40%, #E879F9 80%, #9B6DFF 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 4s linear infinite;
+}
+.ob-tagline {
+    font-size: 1rem;
+    color: rgba(255,255,255,0.45);
+    margin: 0;
+    text-align: center;
+}
+
+/* Feature pills */
+.ob-features {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    z-index: 1;
+    animation: ob-fadein 0.8s 0.2s ease both;
+}
+.ob-feature-pill {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(12px);
+    border-radius: 16px;
+    padding: 16px 20px;
+    font-size: 0.95rem;
+    color: rgba(255,255,255,0.8);
+    letter-spacing: 0.2px;
+}
+
+/* Bottom CTA */
+.ob-bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    z-index: 1;
+    animation: ob-fadein 0.8s 0.4s ease both;
+}
+.ob-spotify-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    padding: 18px;
+    background: #1DB954;
+    border-radius: 100px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #000;
+    text-decoration: none;
+    letter-spacing: 0.3px;
+    box-shadow: 0 8px 32px rgba(29, 185, 84, 0.35);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.ob-spotify-btn:active {
+    transform: scale(0.97);
+    box-shadow: 0 4px 16px rgba(29, 185, 84, 0.25);
+}
+.ob-spotify-icon {
+    width: 22px; height: 22px;
+    flex-shrink: 0;
+}
+.ob-disclaimer {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.25);
+    text-align: center;
+    margin: 0;
+}
+
+@keyframes ob-fadein {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── DESKTOP: centered card layout ── */
+@media (min-width: 768px) {
+    .onboarding-screen {
+        position: relative;
+        inset: auto;
+        max-width: 420px;
+        min-height: 100vh;
+        margin: 0 auto;
+        padding: 80px 40px 60px;
+        border-left: 1px solid rgba(255,255,255,0.06);
+        border-right: 1px solid rgba(255,255,255,0.06);
+    }
+
+    /* Blobs stay full screen behind the card */
+    .ob-blob-1 { left: calc(50% - 400px); }
+    .ob-blob-2 { right: calc(50% - 400px); }
+
+
+    .ob-appname { font-size: 3rem; }
+
+    .ob-spotify-btn {
+        padding: 20px;
+        font-size: 1.05rem;
+    }
+
+    .ob-feature-pill {
+        font-size: 1rem;
+        padding: 18px 24px;
+    }
+}

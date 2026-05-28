@@ -2,7 +2,7 @@
 // movie_actions.php — підключається в movie.php
 // Змінні $movieId, $IS_LOGGED_IN, $CURRENT_USER_ID вже доступні з movie.php
 
-require_once __DIR__ . '/db_connect.php';
+require_once __DIR__ . '/../../config/db_connect.php';
 
 if (!isset($movieId)) return;
 
@@ -39,39 +39,28 @@ if (!$isLoggedIn || !$localMovieId) {
     return;
 }
 ?>
-<div style="display:flex; align-items:center; gap:12px;">
-    <!-- Голосування -->
-    <div style="display:flex; align-items:center; gap:4px;">
-        <form action="vote.php" method="post">
+<div class="movie-actions-container">
+    <div class="vote-controls">
+        <form action="../actions/vote.php" method="post">
             <input type="hidden" name="movie_id" value="<?= $localMovieId ?>">
             <input type="hidden" name="vote" value="1">
-            <button type="submit" style="font-size:22px; background:none; border:none; color:<?= $userVote===1?'#a78bfa':'#555' ?>; cursor:pointer; padding:0;">⬆</button>
+            <button type="submit" class="btn-vote <?= $userVote===1 ? 'active' : 'inactive' ?>">⬆</button>
         </form>
 
-        <span style="font-size:18px; color:#fff; font-weight:700; min-width:30px; text-align:center;">
-            <?= ($voteScore >= 0 ? '+' : '') . $voteScore ?>
+        <span class="vote-score">
+            <?= ($voteScore > 0 ? '+' : '') . $voteScore ?>
         </span>
 
-        <form action="vote.php" method="post">
+        <form action="../actions/vote.php" method="post">
             <input type="hidden" name="movie_id" value="<?= $localMovieId ?>">
             <input type="hidden" name="vote" value="-1">
-            <button type="submit" style="font-size:22px; background:none; border:none; color:<?= $userVote===-1?'#a78bfa':'#555' ?>; cursor:pointer; padding:0;">⬇</button>
+            <button type="submit" class="btn-vote <?= $userVote===-1 ? 'active' : 'inactive' ?>">⬇</button>
         </form>
     </div>
 
-    <!-- Закладка -->
-    <form action="toggle_favorite.php" method="post">
+    <form action="../actions/toggle_favorite.php" method="post">
         <input type="hidden" name="movie_id" value="<?= $localMovieId ?>">
-        <button type="submit" style="
-            background: <?= $isFavorite ? '#4a1a6a' : '#1a0a24' ?>;
-            color: #fff;
-            padding: 8px 16px;
-            border-radius: 8px;
-            border: 1px solid <?= $isFavorite ? '#a78bfa' : '#3a1a4a' ?>;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-        ">
+        <button type="submit" class="btn-favorite-toggle <?= $isFavorite ? 'saved' : 'unsaved' ?>">
             <?= $isFavorite ? '💜 У закладках' : '🤍 Додати в закладки' ?>
         </button>
     </form>

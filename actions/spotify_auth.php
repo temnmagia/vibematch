@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/../config/config.php';
 
 $code_verifier  = bin2hex(random_bytes(64));
 $_SESSION['code_verifier'] = $code_verifier;
