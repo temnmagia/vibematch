@@ -603,3 +603,50 @@ document.addEventListener('DOMContentLoaded', () => {
         lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
     }, { passive: true, capture: true }); 
 });
+
+/* ========================================================
+   ДОДАВАННЯ В ЗАКЛАДКИ (Анімація Сердечка на головній)
+======================================================== */
+function toggleFavorite(tmdbId, btn) {
+    const originalText = btn.innerHTML;
+    
+    // Візуальна індикація завантаження
+    btn.innerHTML = '⏳'; 
+    btn.disabled = true;
+
+    // Готуємо дані для відправки
+    const formData = new FormData();
+    formData.append('tmdb_id', tmdbId);
+    formData.append('is_ajax', 1);
+
+    // Відправляємо на твій існуючий файл!
+    fetch('../actions/toggle_favorite.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        btn.disabled = false;
+        if (data.success) {
+            if (data.is_favorite) {
+                // Додано в закладки
+                btn.innerHTML = '💖'; 
+                btn.style.background = 'rgba(255, 20, 147, 0.2)'; // Легкий рожевий фон
+                btn.style.transform = 'scale(1.2)'; // Ефект пульсації
+                setTimeout(() => btn.style.transform = 'scale(1)', 200);
+            } else {
+                // Видалено з закладок
+                btn.innerHTML = '🤍'; // Або 💜, якщо хочеш
+                btn.style.background = ''; 
+            }
+        } else {
+            console.error("Помилка:", data.error);
+            btn.innerHTML = originalText;
+        }
+    })
+    .catch(err => {
+        console.error('Помилка fetch:', err);
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    });
+}

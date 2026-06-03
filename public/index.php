@@ -185,38 +185,73 @@ if ($isLoggedIn) {
 }
 
 // -------------------------------------------------------
-// 5. БУДУЄМО СТРІЧКУ — повністю перемішану, без послідовності
+// 5. БУДУЄМО СТРІЧКУ
+//
+// Two shuffled sections separated by a fixed divider:
+//
+// SECTION A (shuffled):
+//   daily recs + movie_of_day + suggestions + friend activity
+//
+// [ alltime_divider ] — fixed, never moves
+//
+// SECTION B (shuffled):
+//   all-time recs + friend activity
 // -------------------------------------------------------
-$mixedFeed = [];
 
-// Додаємо рекомендації
+// Split $movies into daily items and all-time items
+// give_movies.php puts alltime_divider as a marker between them
+$dailyItems   = [];
+$allTimeItems = [];
+$dividerItem  = null;
+$pastDivider  = false;
+
 foreach ($movies as $m) {
-    $m['feed_item_type'] = 'recommendation';
-    $mixedFeed[] = $m;
+    if (isset($m['feed_item_type']) && $m['feed_item_type'] === 'alltime_divider') {
+        $dividerItem = $m;
+        $pastDivider = true;
+        continue;
+    }
+    if (!$pastDivider) {
+        $m['feed_item_type'] = $m['feed_item_type'] ?? 'recommendation';
+        $dailyItems[] = $m;
+    } else {
+        $m['feed_item_type'] = $m['feed_item_type'] ?? 'recommendation';
+        $allTimeItems[] = $m;
+    }
 }
 
-// Додаємо активність друзів
+// Prepare friend activity — split half for each section
+$friendItems = [];
 foreach ($friendFeed as $f) {
     $f['feed_item_type'] = 'friend_activity';
-    $mixedFeed[] = $f;
+    $friendItems[] = $f;
 }
+shuffle($friendItems);
+$halfFriend  = (int)ceil(count($friendItems) / 2);
+$friendsForA = array_slice($friendItems, 0, $halfFriend);
+$friendsForB = array_slice($friendItems, $halfFriend);
 
-// Додаємо "Фільм дня" тільки при першому генеруванні вайбу.
-// При оновленні (refresh_recommendations) give_movies.php встановлює
-// $_SESSION['show_movie_of_day'] = false, тому блок не з'явиться повторно.
+// Section A: daily + motd + suggestions + first half of friends → shuffle
+$sectionA = $dailyItems;
 if ($movieOfDay && ($_SESSION['show_movie_of_day'] ?? false)) {
     $motdItem = $movieOfDay;
     $motdItem['feed_item_type'] = 'movie_of_day';
-    $mixedFeed[] = $motdItem;
+    $sectionA[] = $motdItem;
 }
-
-// НОВЕ: Вставляємо блок "Можливо знайомі" як один елемент стрічки
 if (!empty($suggestions)) {
-    $mixedFeed[] = ['feed_item_type' => 'suggestions', 'data' => $suggestions];
+    $sectionA[] = ['feed_item_type' => 'suggestions', 'data' => $suggestions];
 }
+$sectionA = array_merge($sectionA, $friendsForA);
+shuffle($sectionA);
 
-// НОВЕ: Повне перемішування — жодної фіксованої послідовності
-shuffle($mixedFeed);
+// Section B: all-time + second half of friends → shuffle
+$sectionB = array_merge($allTimeItems, $friendsForB);
+shuffle($sectionB);
+
+// Final feed: A + divider + B
+$mixedFeed = $sectionA;
+if ($dividerItem) $mixedFeed[] = $dividerItem;
+$mixedFeed = array_merge($mixedFeed, $sectionB);
 ?>
 <!DOCTYPE html>
 <html lang="uk">
@@ -313,11 +348,13 @@ shuffle($mixedFeed);
                             </div>
 
                             <div class="ab-actions-bar">
-                                <a href="movie.php?id=<?= $item['tmdb_id'] ?>" class="ab-btn ab-btn-icon">ℹ️</a>
-                                <button class="ab-btn ab-btn-main" onclick="rateGenreMatch(<?= $item['tmdb_id'] ?>, this)">
+                                <a href="movie.php?id=<?= $item['tmdb_id'] ?>" class="ab-btn ab-btn-icon" title="Детальніше">ℹ️</a>
+                                <a href="movie.php?id=<?= $item['tmdb_id'] ?>" class="ab-btn ab-btn-main">
                                     Дивитись 🎬
+                                </a>
+                                <button class="ab-btn ab-btn-icon" onclick="toggleFavorite(<?= $item['tmdb_id'] ?>, this)" title="В закладки">
+                                    💜
                                 </button>
-                                <button class="ab-btn ab-btn-icon">💜</button>
                             </div>
                         </section>
 
@@ -373,6 +410,29 @@ shuffle($mixedFeed);
                             </div>
                         </section>
 
+                    <?php
+                    // ====================================================
+                    // РОЗПОДІЛЬНИК: ЩОДЕННИЙ → ВСІ ЧАСИ
+                    // ====================================================
+                    elseif ($item['feed_item_type'] === 'alltime_divider'): ?>
+                        <section class="ab-snap-section" data-action-type="alltime_divider">
+                            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1.2rem; text-align:center; padding: 2rem;">
+                                <div style="font-size:2.5rem;">🎬</div>
+                                <h2 class="ab-headline" style="color:var(--accent-violet-soft); margin:0;">найкраще за всі часи</h2>
+                                <p style="color:rgba(255,255,255,0.5); font-size:0.9rem; margin:0;">
+                                    Твій денний вайб — переглянуто.<br>
+                                    Далі — топові фільми під твій музичний смак.
+                                </p>
+                                <?php if (!empty($item['daily_genres'])): ?>
+                                <div style="display:flex; flex-wrap:wrap; gap:0.5rem; justify-content:center; margin-top:0.5rem;">
+                                    <?php foreach (array_slice($item['daily_genres'], 0, 3) as $dg): ?>
+                                        <span class="ab-listen-pill" style="font-size:0.75rem;"><?= htmlspecialchars($dg) ?></span>
+                                    <?php endforeach; ?>
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                        </section>
+
                     <?php 
                     // ====================================================
                     // ПЕРСОНАЛЬНА РЕКОМЕНДАЦІЯ
@@ -380,10 +440,21 @@ shuffle($mixedFeed);
                     elseif ($item['feed_item_type'] === 'recommendation'): ?>
                         <section class="ab-snap-section" data-action-type="recommendation">
                             <div class="ab-context-header">
-                                <h2 class="ab-headline">твій вайб</h2>
+                                <?php if (!empty($item['is_daily'])): ?>
+                                    <h2 class="ab-headline" style="
+                                        background: linear-gradient(90deg, #f472b6, #a78bfa);
+                                        -webkit-background-clip: text;
+                                        -webkit-text-fill-color: transparent;
+                                        background-clip: text;
+                                        text-shadow: none;
+                                        filter: drop-shadow(0 0 12px rgba(167,139,250,0.5));
+                                    ">✦ денний вайб ✦</h2>
+                                <?php else: ?>
+                                    <h2 class="ab-headline">твій вайб</h2>
+                                <?php endif; ?>
                                 <div class="ab-user-badge-wrapper">
-                                    <div class="ab-user-avatar">🎧</div>
-                                    <span class="ab-listen-pill"><?= $item['match_percent'] ?? rand(75,99) ?>% метч</span>
+                                    <div class="ab-user-avatar"><?= !empty($item['is_daily']) ? '🌟' : '🎧' ?></div>
+                                    <span class="ab-listen-pill" <?= !empty($item['is_daily']) ? 'style="background: linear-gradient(135deg, #f472b6, #a78bfa); color: #fff;"' : '' ?>><?= $item['match_percent'] ?? rand(75,99) ?>% метч</span>
                                 </div>
                             </div>
 
@@ -410,7 +481,9 @@ shuffle($mixedFeed);
                                 <button class="ab-btn ab-btn-main" onclick="rateGenreMatch(<?= $item['tmdb_id'] ?>, this)">
                                     В точку! 🎯
                                 </button>
-                                <button class="ab-btn ab-btn-icon">💜</button>
+                                <button class="ab-btn ab-btn-icon" onclick="toggleFavorite(<?= $item['tmdb_id'] ?>, this)" title="В закладки">
+                                    💜
+                                </button>
                             </div>
                         </section>
 

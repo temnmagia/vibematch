@@ -224,44 +224,47 @@ if (!empty($friendIds)) {
         <div class="friends-feed">
             <div class="section-card">
                 <h3>🎬 Активність друзів</h3>
-                <?php if (empty($friendFeed)): ?>
-                    <p class="empty-state">Тут з'явиться активність твоїх друзів.</p>
-                <?php else: ?>
-                    <?php foreach ($friendFeed as $item):
-                        $icon = match($item['type']) {
-                            'favorite'       => '💜', 'vote_up'        => '⬆️',
-                            'vote_down'      => '⬇️', 'react_fire'     => '🔥',
-                            'react_cry'      => '😭', 'react_alien'    => '👽',
-                            'accuracy_match' => '🎯', default          => '🎬',
-                        };
-                        $action = match($item['type']) {
-                            'favorite'       => 'додав у закладки',
-                            'vote_up'        => 'оцінив (+1)',
-                            'vote_down'      => 'знизив рейтинг',
-                            'react_fire'     => 'вважає вогненним',
-                            'react_cry'      => 'плаче від',
-                            'react_alien'    => 'зловив дивний вайб від',
-                            'accuracy_match' => 'підтвердив точність вайбу для',
-                            default          => 'взаємодіяв з',
-                        };
-                        $utcDate = $item['created_at']; 
-                    ?>
-                    <div class="feed-item" data-user-id="<?= $item['user_id'] ?>" data-activity-id="<?= $item['id'] ?>">
-                        <?php if (!empty($item['image_url'])): ?>
-                            <img src="<?= htmlspecialchars($item['image_url']) ?>" alt="poster" class="feed-poster">
-                        <?php else: ?>
-                            <div class="feed-poster-placeholder"></div>
-                        <?php endif; ?>
-                        <div class="feed-text">
-                            <span style="font-size: 1.2rem; margin-right: 5px;"><?= $icon ?></span>
-                            <strong><?= htmlspecialchars($item['user_name']) ?></strong> <?= $action ?>
-                            <a href="movie.php?id=<?= $item['tmdb_id'] ?>"><em><?= htmlspecialchars($item['title']) ?></em></a>
-                            <span class="feed-time" data-utc="<?= htmlspecialchars($utcDate) ?>"></span>
+                
+                <div class="feed-scroll-area">
+                    <?php if (empty($friendFeed)): ?>
+                        <p class="empty-state">Тут з'явиться активність твоїх друзів.</p>
+                    <?php else: ?>
+                        <?php foreach ($friendFeed as $item):
+                            $icon = match($item['type']) {
+                                'favorite'       => '💜', 'vote_up'        => '⬆️',
+                                'vote_down'      => '⬇️', 'react_fire'     => '🔥',
+                                'react_cry'      => '😭', 'react_alien'    => '👽',
+                                'accuracy_match' => '🎯', default          => '🎬',
+                            };
+                            $action = match($item['type']) {
+                                'favorite'       => 'додав у закладки',
+                                'vote_up'        => 'оцінив (+1)',
+                                'vote_down'      => 'знизив рейтинг',
+                                'react_fire'     => 'вважає вогненним',
+                                'react_cry'      => 'плаче від',
+                                'react_alien'    => 'зловив дивний вайб від',
+                                'accuracy_match' => 'підтвердив точність вайбу для',
+                                default          => 'взаємодіяв з',
+                            };
+                            $utcDate = $item['created_at']; 
+                        ?>
+                        <div class="feed-item" data-user-id="<?= $item['user_id'] ?>" data-activity-id="<?= $item['id'] ?>">
+                            <?php if (!empty($item['image_url'])): ?>
+                                <img src="<?= htmlspecialchars($item['image_url']) ?>" alt="poster" class="feed-poster">
+                            <?php else: ?>
+                                <div class="feed-poster-placeholder"></div>
+                            <?php endif; ?>
+                            <div class="feed-text">
+                                <span style="font-size: 1.2rem; margin-right: 5px;"><?= $icon ?></span>
+                                <strong><?= htmlspecialchars($item['user_name']) ?></strong> <?= $action ?>
+                                <a href="movie.php?id=<?= $item['tmdb_id'] ?>"><em><?= htmlspecialchars($item['title']) ?></em></a>
+                                <span class="feed-time" data-utc="<?= htmlspecialchars($utcDate) ?>"></span>
+                            </div>
                         </div>
-                    </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+                </div>
         </div>
     </div>
 </main>
